@@ -7,12 +7,12 @@ using System.Collections.Generic;
 public class TestScript : MonoBehaviour {
 
     public Camera projectorCamera;
-
-    // used for intrinsic guess
-
+    private CvMat prevIntrinsic;
 
     public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
     {
+        double height = (double)Screen.height;
+        double width = (double)Screen.width;
         int pointsCount = _imagePositions.Count;
         int ImageNum = 1;
         int[] pointCountsValue = new int[ImageNum];
@@ -40,22 +40,32 @@ public class TestScript : MonoBehaviour {
         CvMat imagePoints = new CvMat(pointsCount, 1, MatrixType.F32C2, allCorners.ToArray());
         CvMat pointCounts = new CvMat(ImageNum, 1, MatrixType.S32C1, pointCountsValue);
 
-        double fx = 7.42; // not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
-        double fy = 7.42;
-        double height = (double)Screen.height;
-        double width = (double)Screen.width;
-        double cx = height / 2.0;
-        double cy = width / 2.0;
-        double[] intrGuess = new double[] { fx, 0.0, cx, 
+        //float fl = viewHeight / (2.0 * Mathf.Tan(0.5f * projectorCamera.fieldOfView * Mathf.Deg2Rad));
+ 
+
+        CvMat intrinsic;
+        if (prevIntrinsic == null)
+        {
+            double fx = 37.469987986050846; // not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
+            double fy = 37.469987986050846;
+            double cx = height / 2.0;
+            double cy = width / 2.0;
+            double[] intrGuess = new double[] { fx, 0.0, cx, 
             0.0, fy, cy, 
             0.0, 0.0, 1.0 };
+            intrinsic = new CvMat(3, 3, MatrixType.F64C1, intrGuess);
+        }
+        else
+        {
+            intrinsic = prevIntrinsic;
+        }
 
-        CvMat intrinsic = new CvMat(3, 3, MatrixType.F64C1, intrGuess);
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
         CvMat rotation = new CvMat(ImageNum, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(ImageNum, 3, MatrixType.F64C1);
 
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, new Size(width,height), intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess);
+        prevIntrinsic = intrinsic;
 
         using (var fs = new CvFileStorage("camera.xml", null, OpenCvSharp.FileStorageMode.Write))
         {
