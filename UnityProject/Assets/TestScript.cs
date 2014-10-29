@@ -41,7 +41,6 @@ public class TestScript : MonoBehaviour {
         CvMat pointCounts = new CvMat(ImageNum, 1, MatrixType.S32C1, pointCountsValue);
 
         //float fl = viewHeight / (2.0 * Mathf.Tan(0.5f * projectorCamera.fieldOfView * Mathf.Deg2Rad));
- 
 
         CvMat intrinsic;
         if (prevIntrinsic == null)
