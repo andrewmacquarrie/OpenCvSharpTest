@@ -11,8 +11,8 @@ public class TestScript : MonoBehaviour {
 
     public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
     {
-        double height = (double)Screen.height;
-        double width = (double)Screen.width;
+        double height = (double) Screen.height;
+        double width = (double) Screen.width;
         int pointsCount = _imagePositions.Count;
         int ImageNum = 1;
         int[] pointCountsValue = new int[ImageNum];
@@ -47,8 +47,8 @@ public class TestScript : MonoBehaviour {
         {
             double fx = 37.469987986050846; // not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
             double fy = 37.469987986050846;
-            double cx = height / 2.0;
-            double cy = width / 2.0;
+            double cy = height / 2.0;
+            double cx = width / 2.0;
             double[] intrGuess = new double[] { fx, 0.0, cx, 
             0.0, fy, cy, 
             0.0, 0.0, 1.0 };

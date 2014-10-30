@@ -8,7 +8,8 @@ public class CrossHair : MonoBehaviour
     public TestScript plugin;
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
-    public int minNumberOfPoints = 10;
+    List<Vector3> _normalizedImagePositions = new List<Vector3>();
+    public int minNumberOfPoints = 6;
 
     // Use this for initialization
     void Start()
@@ -26,14 +27,12 @@ public class CrossHair : MonoBehaviour
 
         _imagePositions.ForEach(delegate(Vector3 position)
         {
-            GL.Color(Color.black);
-            GL.Begin(GL.QUADS);
-            GL.Vertex3(position.x, position.y, 0);
-            GL.Vertex3(position.x + 5, position.y, 0);
-            GL.Vertex3(position.x + 5, position.y + 5, 0);
-            GL.Vertex3(position.x, position.y + 5, 0);
-            GL.End();
+            int imagePointMarkerWidth = 5;
+            GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), crosshairTexture);
         });
+
+
+        GUI.Box(new Rect(10, 10, 100, 90), _imagePositions.Count.ToString());
     }
 
     void Update()
@@ -58,6 +57,7 @@ public class CrossHair : MonoBehaviour
                 Vector3 pos = Input.mousePosition;
                 pos.y = Screen.height - pos.y; // note the screen pos starts bottom left. We want top left origin
                 _imagePositions.Add(pos);
+               //_normalizedImagePositions.Add(normalise(pos));
 
                 if (_imagePositions.Count > minNumberOfPoints)
                 {
@@ -65,5 +65,10 @@ public class CrossHair : MonoBehaviour
                 }
             }
         }
+    }
+
+    private Vector3 normalise(Vector3 pos)
+    {
+        return new Vector3(pos.x / (float) Screen.width, pos.y / (float) Screen.height);
     }
 }
