@@ -45,7 +45,7 @@ public class TestScript : MonoBehaviour {
         CvMat intrinsic;
         if (prevIntrinsic == null)
         {
-            double fx = 37.469987986050846; // not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
+            double fx = 37.469987986050846; // OLD COMMENT (now using ~fov of camera in unity): not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
             double fy = 37.469987986050846;
             double cy = height / 2.0;
             double cx = width / 2.0;
@@ -63,7 +63,7 @@ public class TestScript : MonoBehaviour {
         CvMat rotation = new CvMat(ImageNum, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(ImageNum, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, new Size(width,height), intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess);
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, new Size(width, height), intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixPrincipalPoint);
         prevIntrinsic = intrinsic;
 
         using (var fs = new CvFileStorage("camera.xml", null, OpenCvSharp.FileStorageMode.Write))
@@ -85,8 +85,10 @@ public class TestScript : MonoBehaviour {
         double ry = rotation[0, 1];
         double rz = rotation[0, 2];
 
-        projectorCamera.transform.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
-        projectorCamera.transform.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
+        projectorCamera.transform.position = new Vector3((float) x, (float) y, (float) z);
+        //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
+        projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
+        //.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
 
 	}
 	
