@@ -66,6 +66,16 @@ public class TestScript : MonoBehaviour {
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, new Size(width, height), intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixPrincipalPoint);
         prevIntrinsic = intrinsic;
 
+        int PatSize = pointsCount;
+        CvMat subImagePoints, subObjectPoints;
+        Cv.GetRows(imagePoints, out subImagePoints, 0, PatSize);
+        Cv.GetRows(objectPoints, out subObjectPoints, 0, PatSize);
+        CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
+        CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
+
+        Cv.FindExtrinsicCameraParams2(subObjectPoints, subImagePoints, intrinsic, distortion, rotation_, translation_, false);
+            
+
         using (var fs = new CvFileStorage("camera.xml", null, OpenCvSharp.FileStorageMode.Write))
         {
             fs.Write("intrinsic", intrinsic);
@@ -77,13 +87,13 @@ public class TestScript : MonoBehaviour {
         // NB code is mostly from:
         // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
 
-        double x = translation[0, 0];
-        double y = translation[0, 1];
-        double z = translation[0, 2];
+        double x = translation_[0, 0];
+        double y = translation_[0, 1];
+        double z = translation_[0, 2];
 
-        double rx = rotation[0, 0];
-        double ry = rotation[0, 1];
-        double rz = rotation[0, 2];
+        double rx = rotation_[0, 0];
+        double ry = rotation_[0, 1];
+        double rz = rotation_[0, 2];
 
         projectorCamera.transform.position = new Vector3((float) x, (float) y, (float) z);
         //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);

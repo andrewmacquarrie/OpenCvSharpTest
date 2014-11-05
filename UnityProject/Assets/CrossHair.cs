@@ -37,6 +37,9 @@ public class CrossHair : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
         if (Input.GetMouseButtonDown(0))
         {
             if (_imagePositions.Count == _objectPositions.Count)
@@ -57,7 +60,7 @@ public class CrossHair : MonoBehaviour
                 Vector3 pos = Input.mousePosition;
                 pos.y = Screen.height - pos.y; // note the screen pos starts bottom left. We want top left origin
                 _imagePositions.Add(pos);
-               //_normalizedImagePositions.Add(normalise(pos));
+               _normalizedImagePositions.Add(normalise(pos));
 
                 if (_imagePositions.Count > minNumberOfPoints)
                 {
