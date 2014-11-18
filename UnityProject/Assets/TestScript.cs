@@ -3,13 +3,15 @@ using System.Collections;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
 using System.Collections.Generic;
+using System.Text;
 
 public class TestScript : MonoBehaviour {
 
     public Camera projectorCamera;
+    public Camera _mainCamera;
     private CvMat prevIntrinsic;
 
-    public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
+    public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
         double height = (double) Screen.height;
         double width = (double) Screen.width;
@@ -42,13 +44,32 @@ public class TestScript : MonoBehaviour {
 
         //float fl = viewHeight / (2.0 * Mathf.Tan(0.5f * projectorCamera.fieldOfView * Mathf.Deg2Rad));
 
+        Size size = new Size(width, height);
+
         CvMat intrinsic;
         if (prevIntrinsic == null)
         {
-            double fx = 37.469987986050846; // OLD COMMENT (now using ~fov of camera in unity): not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
-            double fy = 37.469987986050846;
+            //double fx = 37.469987986050846; // OLD COMMENT (now using ~fov of camera in unity): not sure http://www.optoma.co.uk/projectordetails.aspx?PTypeDB=Business&PC=EH200ST
+            //double fy = 37.469987986050846;
+
+            float fov = 60.0f;
+            float focalLength = (float) height / (2.0f * Mathf.Tan(0.5f * fov * Mathf.Deg2Rad));
+
+            double fx = focalLength;
+            double fy = focalLength;
+
             double cy = height / 2.0;
             double cx = width / 2.0;
+
+            if (usingNormalized)
+            {
+                fx = fx / width;
+                fy = fy / height;
+                cy = cy / height;
+                cx = cx / width;
+                size = new Size(1, 1);
+            }
+
             double[] intrGuess = new double[] { fx, 0.0, cx, 
             0.0, fy, cy, 
             0.0, 0.0, 1.0 };
@@ -63,41 +84,32 @@ public class TestScript : MonoBehaviour {
         CvMat rotation = new CvMat(ImageNum, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(ImageNum, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, new Size(width, height), intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixPrincipalPoint);
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.ZeroTangentDist);
         prevIntrinsic = intrinsic;
 
-        int PatSize = pointsCount;
-        CvMat subImagePoints, subObjectPoints;
-        Cv.GetRows(imagePoints, out subImagePoints, 0, PatSize);
-        Cv.GetRows(objectPoints, out subObjectPoints, 0, PatSize);
-        CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
-        CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
+       CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
+       CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
 
-        Cv.FindExtrinsicCameraParams2(subObjectPoints, subImagePoints, intrinsic, distortion, rotation_, translation_, false);
-            
+       translation_[0, 0] = _mainCamera.transform.position.x;
+       translation_[0, 1] = _mainCamera.transform.position.y;
+       translation_[0, 2] = _mainCamera.transform.position.z;
 
-        using (var fs = new CvFileStorage("camera.xml", null, OpenCvSharp.FileStorageMode.Write))
-        {
-            fs.Write("intrinsic", intrinsic);
-            fs.Write("rotation", rotation);
-            fs.Write("translation", translation);
-            fs.Write("distortion", distortion);
-        }
+       Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation_, translation_, true);
 
         // NB code is mostly from:
         // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
 
-        double x = translation_[0, 0];
-        double y = translation_[0, 1];
-        double z = translation_[0, 2];
+        double x = translation[0, 0];
+        double y = translation[0, 1];
+        double z = translation[0, 2];
 
-        double rx = rotation_[0, 0];
-        double ry = rotation_[0, 1];
-        double rz = rotation_[0, 2];
+        double rx = rotation[0, 0];
+        double ry = rotation[0, 1];
+        double rz = rotation[0, 2];
 
-        projectorCamera.transform.position = new Vector3((float) x, (float) y, (float) z);
+        projectorCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
         //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
-        projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
+        //projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
         //.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
 
 	}
@@ -106,4 +118,34 @@ public class TestScript : MonoBehaviour {
 	void Update () {
 	
 	}
+
+
+    private string ShowMatrix(CvMat mat)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < mat.Rows; x++)
+        {
+            for (int y = 0; y < mat.Cols; y++)
+            {
+                sb.Append(mat[x, y] + " ");
+            }
+            sb.AppendLine("");
+        }
+        return sb.ToString();
+    }
+
+    private string Form(CvPoint3D32f[,] ar)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ar.Length; i++)
+        {
+            sb.Append(Form(ar[0,i]));
+        }
+        return sb.ToString();
+    }
+
+    private string Form(CvPoint3D32f s)
+    {
+        return "" + s.X + ", " + s.Y + ", " + s.Z + ", ";
+    }
 }

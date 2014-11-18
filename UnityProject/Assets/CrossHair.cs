@@ -6,10 +6,11 @@ public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
     public TestScript plugin;
+    public CalibrationCpp cppPlugin;
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
     List<Vector3> _normalizedImagePositions = new List<Vector3>();
-    public int minNumberOfPoints = 6;
+    public int minNumberOfPoints = 10;
 
     // Use this for initialization
     void Start()
@@ -62,9 +63,9 @@ public class CrossHair : MonoBehaviour
                 _imagePositions.Add(pos);
                _normalizedImagePositions.Add(normalise(pos));
 
-                if (_imagePositions.Count > minNumberOfPoints)
+                if (_imagePositions.Count >= minNumberOfPoints)
                 {
-                    plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions);
+                    cppPlugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
                 }
             }
         }

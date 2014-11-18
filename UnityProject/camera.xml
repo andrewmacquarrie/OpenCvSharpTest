@@ -5,27 +5,25 @@
   <cols>3</cols>
   <dt>d</dt>
   <data>
-    1.0392312811898094e+003 0. 800. 0. 1.0392311238643572e+003 600. 0.
-    0. 1.</data></intrinsic>
+    6.4063318723050577e+002 0. 3.0456528942835411e+002 0.
+    6.4546661722722706e+002 2.3822998181685998e+002 0. 0. 1.</data></intrinsic>
 <rotation type_id="opencv-matrix">
   <rows>1</rows>
   <cols>3</cols>
-  <dt>d</dt>
+  <dt>f</dt>
   <data>
-    3.7724472812058341e-008 2.8210556477359963e+000
-    4.7776596924959960e-008</data></rotation>
+    2.59552193e+000 -5.61890483e-001 4.99862105e-001</data></rotation>
 <translation type_id="opencv-matrix">
   <rows>1</rows>
   <cols>3</cols>
-  <dt>d</dt>
+  <dt>f</dt>
   <data>
-    7.3313953902008289e-001 -9.9999958693269386e-001
-    -9.7563176612163893e+000</data></translation>
+    2.99947567e+001 7.14272919e+001 3.80132172e+002</data></translation>
 <distortion type_id="opencv-matrix">
   <rows>1</rows>
   <cols>4</cols>
   <dt>d</dt>
   <data>
-    -2.8898073689304119e-007 9.8964282847779408e-007
-    9.4038761480675666e-008 2.6237766694629663e-007</data></distortion>
+    -2.4054340925364145e-001 4.8394349483773902e-001
+    -1.5269915582913332e-002 8.2284038263143243e-004</data></distortion>
 </opencv_storage>
