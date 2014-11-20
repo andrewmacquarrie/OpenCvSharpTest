@@ -42,10 +42,15 @@ objectPoints = [-7.1087265014648, 8.2005195617675, 6.13520765304565;
 -22.152841567993, 7.0923838615417, 54.8600120544434;]';
 
 fc = [319.56338500976562, 319.56338500976562];
-cc = [481.5, 319.56338500976562];
+cc = [481.5, 184.5];
 kc = [0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0];
 alpha_c = 0.0;
 
 [omckk,Tckk,Rckk,H,x,ex] = compute_extrinsic(imagePoints,objectPoints,fc,cc,kc,alpha_c);
 
 trans = Tckk
+
+% True translation of camera:
+% x: -2.378186 y: 1 z: -9.490389
+
+

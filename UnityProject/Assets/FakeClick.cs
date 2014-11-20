@@ -40,6 +40,8 @@ public class FakeClick : MonoBehaviour {
             _imagePositions.Add(new Vector3(254f, 149f));
 
             plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+
+            // 
         }
 
 	}

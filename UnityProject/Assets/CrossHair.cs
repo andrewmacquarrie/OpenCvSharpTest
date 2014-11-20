@@ -65,7 +65,7 @@ public class CrossHair : MonoBehaviour
 
                 if (_imagePositions.Count >= minNumberOfPoints)
                 {
-                    cppPlugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+                    plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
                 }
             }
         }
