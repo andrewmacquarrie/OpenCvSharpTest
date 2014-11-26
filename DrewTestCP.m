@@ -1,4 +1,4 @@
-
+function DrewTestCP
 
  run('C:\Projects\OpenCvSharpTest\UnityProject\pointData.m')
  

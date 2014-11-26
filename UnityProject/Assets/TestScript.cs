@@ -127,20 +127,31 @@ public class TestScript : MonoBehaviour {
 
         CvMat rotTran = rotLHS.Transpose();
         CvMat transTran = translation_.Transpose();
+        CvMat rotFin = (rotTran * -1);
 
-        CvMat transFinal = (rotTran * -1) * transTran;
+        CvMat transFinal = rotFin * transTran;
+
+        // projectionMatrix: [cameraMatrix] * [R|t].
+        double[] rt = new double[] {rotFin[0,0], rotFin[0,1], rotFin[0,2], translation_[0,1],
+            rotFin[1,0], rotFin[1,1], rotFin[1,2], translation_[1,1], 
+            rotFin[2,0], rotFin[2,1], rotFin[2,2], translation_[2,1], };
+        CvMat rtM = new CvMat(3, 4, MatrixType.F64C1, rt);
+        CvMat projMat = intrinsic * rtM;
+
+        CvPoint3D64f euler = new CvPoint3D64f();
+        Cv.DecomposeProjectionMatrix(projMat, new CvMat(3, 3, MatrixType.F32C1), new CvMat(3, 3, MatrixType.F32C1), new CvMat(4, 1, MatrixType.F32C1), new CvMat(3, 3, MatrixType.F32C1), new CvMat(3, 3, MatrixType.F32C1), new CvMat(3, 3, MatrixType.F32C1), out euler);
 
         double x = transFinal[0, 0];
         double y = transFinal[0, 1];
         double z = transFinal[0, 2];
 
-        double rx = rotation[0, 0];
-        double ry = rotation[0, 1];
-        double rz = rotation[0, 2];
+        double rx = euler.X;
+        double ry = euler.Y;
+        double rz = euler.Z;
 
         projectorCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
         //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
-        //projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
+        projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
         //.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
 
 
