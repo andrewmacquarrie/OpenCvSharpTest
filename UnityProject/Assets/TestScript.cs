@@ -28,7 +28,7 @@ public class TestScript : MonoBehaviour {
             {
                 X = _objectPositions[i].x,
                 Y = _objectPositions[i].y,
-                Z = _objectPositions[i].z
+                Z = _objectPositions[i].z * -1
             };
         }
 
@@ -98,6 +98,10 @@ public class TestScript : MonoBehaviour {
 
         // NB code is mostly from:
         // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
+
+        CvMat rotInv = new CvMat(3, 1, MatrixType.F32C1);
+
+        rotation_.Invert(rotInv as CvArr);
 
         double x = translation[0, 0];
         double y = translation[0, 1];
