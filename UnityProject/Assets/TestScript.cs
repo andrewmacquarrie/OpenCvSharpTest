@@ -132,9 +132,9 @@ public class TestScript : MonoBehaviour {
         CvMat transFinal = rotFin * transTran;
 
         // projectionMatrix: [cameraMatrix] * [R|t].
-        double[] rt = new double[] {rotFin[0,0], rotFin[0,1], rotFin[0,2], translation_[0,1],
-            rotFin[1,0], rotFin[1,1], rotFin[1,2], translation_[1,1], 
-            rotFin[2,0], rotFin[2,1], rotFin[2,2], translation_[2,1], };
+        double[] rt = new double[] {rotFin[0,0], rotFin[0,1], rotFin[0,2], transFinal[0,1],
+            rotFin[1,0], rotFin[1,1], rotFin[1,2], transFinal[1,1], 
+            rotFin[2,0], rotFin[2,1], rotFin[2,2], transFinal[2,1], };
         CvMat rtM = new CvMat(3, 4, MatrixType.F64C1, rt);
         CvMat projMat = intrinsic * rtM;
 
