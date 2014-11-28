@@ -1,3 +1,5 @@
+# Python code extracted from relax:  http://svn.gna.org/svn/relax/1.3/maths_fns/rotation_matrix.py
+
 # Python module imports.
 from copy import deepcopy
 from math import acos, asin, atan2, cos, pi, sin, sqrt, degrees, radians
