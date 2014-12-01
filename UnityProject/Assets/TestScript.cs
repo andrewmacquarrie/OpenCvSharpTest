@@ -15,6 +15,7 @@ public class TestScript : MonoBehaviour {
     public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
         StringBuilder sb = new StringBuilder();
+        StringBuilder sbPython = new StringBuilder();
 
         double height = (double)Screen.height;
         double width = (double)Screen.width;
@@ -131,10 +132,23 @@ public class TestScript : MonoBehaviour {
 
         CvMat transFinal = rotFin * transTran;
 
+        using (StreamWriter outfile = new StreamWriter("../eulerRot.py"))
+        {
+            outfile.WriteLine("from numpy import array, cross, dot, float64, hypot, sign, transpose, zeros");
+            outfile.WriteLine("ROTATION = zeros((3, 3), float64)");
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    outfile.WriteLine("ROTATION[" + i + ", " + j + "] = " + rotTran[i, j]);
+                }
+            }
+        }
+
         // projectionMatrix: [cameraMatrix] * [R|t].
-        double[] rt = new double[] {rotFin[0,0], rotFin[0,1], rotFin[0,2], transFinal[0,1],
-            rotFin[1,0], rotFin[1,1], rotFin[1,2], transFinal[1,1], 
-            rotFin[2,0], rotFin[2,1], rotFin[2,2], transFinal[2,1], };
+        double[] rt = new double[] {rotLHS[0,0], rotLHS[0,1], rotLHS[0,2], translation_[0,1],
+            rotLHS[1,0], rotLHS[1,1], rotLHS[1,2], translation_[1,1], 
+            rotLHS[2,0], rotLHS[2,1], rotLHS[2,2], translation_[2,1], };
         CvMat rtM = new CvMat(3, 4, MatrixType.F64C1, rt);
         CvMat projMat = intrinsic * rtM;
 
@@ -148,6 +162,14 @@ public class TestScript : MonoBehaviour {
         double rx = euler.X;
         double ry = euler.Y;
         double rz = euler.Z;
+
+        sbPython.AppendLine("EULERX = " + euler.X);
+        sbPython.AppendLine("EULERY = " + euler.Y);
+        sbPython.AppendLine("EULERZ = " + euler.Z);
+        using (StreamWriter outfile = new StreamWriter("../eulerAngles.py"))
+        {
+            outfile.Write(sbPython.ToString());
+        }
 
         projectorCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
         //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
