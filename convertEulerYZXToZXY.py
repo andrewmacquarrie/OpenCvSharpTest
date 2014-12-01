@@ -6,7 +6,7 @@ from math import acos, asin, atan2, cos, pi, sin, sqrt, degrees, radians
 from numpy import array, cross, dot, float64, hypot, sign, transpose, zeros
 from numpy.linalg import norm
 from random import gauss, uniform
-
+import eulerAngles
 
 # Global variables.
 EULER_NEXT = [1, 2, 0, 1]    # Used in the matrix_indices() function.
@@ -416,7 +416,133 @@ def matrix_indices(i, neg, alt):
     # Return.
     return j, k, h
 	
-axis, angle = euler_to_axis_angle_yzx(radians(100), radians(0), radians(25))
+	
+	
+	
+	
+	
+def R_to_euler_zxy(R):
+    """Convert the rotation matrix to the zxy Euler angles.
+
+    @param R:       The 3x3 rotation matrix to extract the Euler angles from.
+    @type R:        3D, rank-2 numpy array
+    @return:        The alpha, beta, and gamma Euler angles in the zxy convention.
+    @rtype:         tuple of float
+    """
+
+    # Redirect to R_to_euler()
+    return R_to_euler(R, 'zxy')
+	
+def R_to_euler(R, notation, axes_rot='static', second_sol=False):
+    """Convert the rotation matrix to the given Euler angles.
+
+    This uses the algorithms of Ken Shoemake in "Euler Angle Conversion. Graphics Gems IV. Paul Heckbert (ed.). Academic Press, 1994, ISBN: 0123361567. pp. 222-229." (http://www.graphicsgems.org/).
+
+
+    The Euler angle notation can be one of:
+        - xyx
+        - xyz
+        - xzx
+        - xzy
+        - yxy
+        - yxz
+        - yzx
+        - yzy
+        - zxy
+        - zxz
+        - zyx
+        - zyz
+
+
+    @param R:               The 3x3 rotation matrix to extract the Euler angles from.
+    @type R:                3D, rank-2 numpy array
+    @param notation:        The Euler angle notation to use.
+    @type notation:         str
+    @keyword axes_rot:      The axes rotation - either 'static', the static axes or 'rotating', the rotating axes.
+    @type axes_rot:         str
+    @keyword second_sol:    Return the second solution instead (currently unused).
+    @type second_sol:       bool
+    @return:                The alpha, beta, and gamma Euler angles in the given convention.
+    @rtype:                 tuple of float
+    """
+
+    # Duplicate R to avoid its modification.
+    R = deepcopy(R)
+
+    # Get the Euler angle info.
+    i, neg, alt = EULER_TRANS_TABLE[notation]
+
+    # Axis rotations.
+    rev = 0
+    if axes_rot != 'static':
+        rev = 1
+
+    # Find the other indices.
+    j, k, h = matrix_indices(i, neg, alt)
+
+    # No axis repetition.
+    if alt:
+        # Sine of the beta angle.
+        sin_beta = sqrt(R[i, j]**2 + R[i, k]**2)
+
+        # Non-zero sin(beta).
+        if sin_beta > EULER_EPSILON:
+            alpha = atan2( R[i, j],   R[i, k])
+            beta  = atan2( sin_beta,  R[i, i])
+            gamma = atan2( R[j, i],  -R[k, i])
+
+        # sin(beta) is zero.
+        else:
+            alpha = atan2(-R[j, k],   R[j, j])
+            beta  = atan2( sin_beta,  R[i, i])
+            gamma = 0.0
+
+    # Axis repetition.
+    else:
+        # Cosine of the beta angle.
+        cos_beta = sqrt(R[i, i]**2 + R[j, i]**2)
+
+        # Non-zero cos(beta).
+        if cos_beta > EULER_EPSILON:
+            alpha = atan2( R[k, j],   R[k, k])
+            beta  = atan2(-R[k, i],   cos_beta)
+            gamma = atan2( R[j, i],   R[i, i])
+
+        # cos(beta) is zero.
+        else:
+            alpha = atan2(-R[j, k],  R[j, j])
+            beta  = atan2(-R[k, i],   cos_beta)
+            gamma = 0.0
+
+    # Remapping.
+    if neg:
+        alpha, beta, gamma = -alpha, -beta, -gamma
+    if rev:
+        alpha_old = alpha
+        alpha = gamma
+        gamma = alpha_old
+
+    # Angle wrapping.
+    if alt and -pi < beta < 0.0:
+        alpha = alpha + pi
+        beta = -beta
+        gamma = gamma + pi
+
+    alpha = wrap_angles(alpha, 0.0, 2.0*pi)
+    beta  = wrap_angles(beta,  0.0, 2.0*pi)
+    gamma = wrap_angles(gamma, 0.0, 2.0*pi)
+
+    # Return the Euler angles.
+    return alpha, beta, gamma
+	
+	
+	
+	
+	
+	
+	
+	
+axis, angle = euler_to_axis_angle_yzx(radians(eulerAngles.EULERY), radians(eulerAngles.EULERZ), radians(eulerAngles.EULERX))
 print("Axis is %s" % axis)
 print("angle is %s" % angle)
 alpha, beta, gamma = axis_angle_to_euler_zxy(axis, angle)
