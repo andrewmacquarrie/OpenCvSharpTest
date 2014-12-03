@@ -117,14 +117,17 @@ public class TestScript : MonoBehaviour {
         //CvMat rotInv = new CvMat(3, 3, MatrixType.F32C1);
         //rotationFull.Invert(rotInv as CvArr);
 
-        CvMat rotationFull = new CvMat(3, 3, MatrixType.F32C1);
-        Cv.Rodrigues2(rotation_, rotationFull);
+        CvMat R = new CvMat(3, 3, MatrixType.F32C1);
+        Cv.Rodrigues2(rotation_, R);
 
         float[] LHSflipBackMatrix = new float[] { 1.0f, 0.0f, 0.0f, 
             0.0f, 1.0f, 0.0f, 
             0.0f, 0.0f, -1.0f };
         CvMat LHSflipBackMatrixM = new CvMat(3, 3, MatrixType.F32C1, LHSflipBackMatrix);
-        CvMat rotLHS = rotationFull * LHSflipBackMatrixM; // invert Z (as we did before when savings points) to get from RHS -> LHS
+        CvMat rotLHS = R * LHSflipBackMatrixM; // invert Z (as we did before when savings points) to get from RHS -> LHS
+
+        CvMat rotLHSNoReally = LHSflipBackMatrixM * R.Transpose() * LHSflipBackMatrixM;
+        //CvMat rotLHSNoReallyTrans = ;
 
         CvMat rotTran = rotLHS.Transpose();
         CvMat transTran = translation_.Transpose();
@@ -140,12 +143,10 @@ public class TestScript : MonoBehaviour {
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    outfile.WriteLine("ROTATION[" + i + ", " + j + "] = " + rotTran[i, j]);
+                    outfile.WriteLine("ROTATION[" + i + ", " + j + "] = " + rotLHSNoReally[i, j]);
                 }
             }
         }
-
-        Assets.Rotation r = Assets.RotationConversion.RToEulerZXY(rotTran);
 
         // projectionMatrix: [cameraMatrix] * [R|t].
         double[] rt = new double[] {rotLHS[0,0], rotLHS[0,1], rotLHS[0,2], translation_[0,1],
