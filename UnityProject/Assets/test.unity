@@ -502,7 +502,7 @@ MonoBehaviour:
   crosshairTexture: {fileID: 2800000, guid: a8ead6295272c24479f2c028f25ba604, type: 3}
   plugin: {fileID: 26965275}
   cppPlugin: {fileID: 2137265504}
-  minNumberOfPoints: 10
+  minNumberOfPoints: 8
 --- !u!4 &380553076
 Transform:
   m_ObjectHideFlags: 0
@@ -732,7 +732,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 728524780}
   m_LocalRotation: {x: .148627639, y: -.285736769, z: .0886870846, w: .942549169}
-  m_LocalPosition: {x: 34.4484558, y: 15.5232449, z: -33.0420341}
+  m_LocalPosition: {x: 17.1117401, y: 11.8017273, z: -22.3030758}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

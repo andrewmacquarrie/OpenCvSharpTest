@@ -178,7 +178,9 @@ public class TestScript : MonoBehaviour {
         projectorCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
         //.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
 
-
+        _mainCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
+        //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
+        _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
     }
 	
 	// Update is called once per frame

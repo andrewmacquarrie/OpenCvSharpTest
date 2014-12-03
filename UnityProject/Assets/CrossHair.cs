@@ -10,11 +10,13 @@ public class CrossHair : MonoBehaviour
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
     List<Vector3> _normalizedImagePositions = new List<Vector3>();
-    public int minNumberOfPoints = 10;
+    public int minNumberOfPoints = 8;
+    private bool occludeWorld;
 
     // Use this for initialization
     void Start()
     {
+        occludeWorld = false;
     }
 
     // Update is called once per frame
@@ -24,6 +26,12 @@ public class CrossHair : MonoBehaviour
         var hw = crosshairTexture.width / 2;
 
         var pos = Input.mousePosition;
+        if (occludeWorld)
+        {
+            Texture2D blackTexture = new Texture2D(1, 1);
+            blackTexture.SetPixel(0, 0, Color.black);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), blackTexture);
+        }
         GUI.DrawTexture(new Rect(pos.x - hw, Screen.height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
 
         _imagePositions.ForEach(delegate(Vector3 position)
@@ -53,6 +61,7 @@ public class CrossHair : MonoBehaviour
                     GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     sphere.transform.position = hit3d.point;
                     _objectPositions.Add(hit3d.point);
+                    occludeWorld = true;
                 }
             }
             else
@@ -67,6 +76,7 @@ public class CrossHair : MonoBehaviour
                 {
                     plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
                 }
+                occludeWorld = false;
             }
         }
     }
