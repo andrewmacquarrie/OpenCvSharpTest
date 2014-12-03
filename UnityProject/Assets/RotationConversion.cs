@@ -45,7 +45,8 @@ namespace Assets
             beta = wrap_angles(beta, 0.0, 2.0 * Math.PI); // X
             gamma = wrap_angles(gamma, 0.0, 2.0 * Math.PI); // Y
 
-            return new Rotation(RadianToDegree(beta), RadianToDegree(gamma), RadianToDegree(alpha));
+            // errr... 180 - Z result seems right. Why?
+            return new Rotation(RadianToDegree(beta), RadianToDegree(gamma), 180.0 - RadianToDegree(alpha));
         }
 
         static double wrap_angles(double angle, double lower, double upper)

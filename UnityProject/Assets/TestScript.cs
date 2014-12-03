@@ -175,7 +175,7 @@ public class TestScript : MonoBehaviour {
 
         projectorCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
         //.Translate(new Vector3((float) x, (float) y, (float) z), Space.World);
-        projectorCamera.transform.eulerAngles = new Vector3((float)rx, (float)ry, (float)rz);
+        projectorCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
         //.Rotate(new Vector3((float)rx, (float)ry, (float)rz), Space.World);
 
 
