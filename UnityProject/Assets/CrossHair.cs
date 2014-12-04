@@ -6,7 +6,6 @@ public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
     public Calibration plugin;
-    public CalibrationCpp cppPlugin;
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
     List<Vector3> _normalizedImagePositions = new List<Vector3>();
