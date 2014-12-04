@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class FakeClick : MonoBehaviour {
 
-    public TestScript plugin;
+    public Calibration plugin;
 
 	// Use this for initialization
 	void Start () {

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-public class TestScript : MonoBehaviour {
+public class Calibration : MonoBehaviour {
 
     public Camera projectorCamera;
     public Camera _mainCamera;

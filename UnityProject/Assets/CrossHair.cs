@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
-    public TestScript plugin;
+    public Calibration plugin;
     public CalibrationCpp cppPlugin;
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();

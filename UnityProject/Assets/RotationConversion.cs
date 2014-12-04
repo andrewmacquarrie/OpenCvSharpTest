@@ -8,21 +8,16 @@ namespace Assets
 {
     class RotationConversion
     {
-        static int[] EULER_TRANS = new int[] { 2, 0, 0 };
+        // Maths comes from Python's Relax http://svn.gna.org/svn/relax/1.3/maths_fns/rotation_matrix.py
+
         static float EULER_EPSILON = 0.00005f;
 
         static public Rotation RToEulerZXY(CvMat R)
         {
             var i = 2;
-            var neg = 0;
-            var alt = 0;
-
-            // from matrix_indices
             var j = 0; // EULER_NEXT[2]
             var k = 1; // EULER_NEXT[3]
             var h = i; // alt == 0
-
-            // because !alt
 
             var cos_beta = Math.Sqrt(Math.Pow(R[i, i], 2) + Math.Pow(R[j, i], 2));
 
@@ -39,7 +34,6 @@ namespace Assets
                 beta = Math.Atan2(-R[k, i], cos_beta);
                 gamma = 0.0;
             }
-
 
             alpha = wrap_angles(alpha, 0.0, 2.0 * Math.PI); // Z
             beta = wrap_angles(beta, 0.0, 2.0 * Math.PI); // X
