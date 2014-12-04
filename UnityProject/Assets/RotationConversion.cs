@@ -17,7 +17,6 @@ namespace Assets
             var i = 2;
             var j = 0; // EULER_NEXT[2]
             var k = 1; // EULER_NEXT[3]
-            var h = i; // alt == 0
 
             var cos_beta = Math.Sqrt(Math.Pow(R[i, i], 2) + Math.Pow(R[j, i], 2));
 

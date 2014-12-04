@@ -17,69 +17,28 @@ public class Calibration : MonoBehaviour {
         double height = (double)Screen.height;
         double width = (double)Screen.width;
         int pointsCount = _imagePositions.Count;
-        int ImageNum = 1;
-        int[] pointCountsValue = new int[ImageNum];
+        int numImages = 1;
+        int[] pointCountsValue = new int[numImages];
         pointCountsValue[0] = pointsCount;
 
-        CvPoint3D32f[,] objects = new CvPoint3D32f[ImageNum, pointsCount];
+        CvMat pointCounts = new CvMat(numImages, 1, MatrixType.S32C1, pointCountsValue);
 
-        for (int i = 0; i < pointsCount; i++)
-        {
-            objects[0, i] = new CvPoint3D32f
-            {
-                X = _objectPositions[i].x,
-                Y = _objectPositions[i].y,
-                Z = _objectPositions[i].z * -1
-            };
-        }
-
-        CvMat objectPoints = new CvMat(pointsCount, 3, MatrixType.F32C1, objects);
-        List<CvPoint2D32f> allCorners = new List<CvPoint2D32f>(pointsCount);
-
-        for (int i = 0; i < _imagePositions.Count; i++)
-        {
-            allCorners.Add(new CvPoint2D32f(_imagePositions[i].x, _imagePositions[i].y));
-        }
-
-        CvMat imagePoints = new CvMat(pointsCount, 1, MatrixType.F32C2, allCorners.ToArray());
-        CvMat pointCounts = new CvMat(ImageNum, 1, MatrixType.S32C1, pointCountsValue);
+        CvMat imagePoints = PutImagePointsIntoCVMat(_imagePositions, pointsCount);
+        CvMat objectPoints = PutObjectPointsIntoCVMat(_objectPositions, pointsCount, numImages);
 
         Size size = new Size(width, height);
-
+        if (usingNormalized)
+            size = new Size(1, 1);
+        
         CvMat intrinsic;
         if (prevIntrinsic == null)
-        {
-            float fov = 60.0f;
-            float focalLength = (float)height / (2.0f * Mathf.Tan(0.5f * fov * Mathf.Deg2Rad));
-
-            double fx = focalLength;
-            double fy = focalLength;
-
-            double cy = height / 2.0;
-            double cx = width / 2.0;
-
-            if (usingNormalized)
-            {
-                fx = fx / width;
-                fy = fy / height;
-                cy = cy / height;
-                cx = cx / width;
-                size = new Size(1, 1);
-            }
-
-            double[] intrGuess = new double[] { fx, 0.0, cx, 
-            0.0, fy, cy, 
-            0.0, 0.0, 1.0 };
-            intrinsic = new CvMat(3, 3, MatrixType.F64C1, intrGuess);
-        }
+            intrinsic = createIntrinsicMatrix(height, width, usingNormalized);
         else
-        {
             intrinsic = prevIntrinsic;
-        }
 
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
-        CvMat rotation = new CvMat(ImageNum, 3, MatrixType.F64C1);
-        CvMat translation = new CvMat(ImageNum, 3, MatrixType.F64C1);
+        CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
+        CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
         prevIntrinsic = intrinsic;
@@ -121,6 +80,61 @@ public class Calibration : MonoBehaviour {
 
         _mainCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
+    }
+
+    private CvMat createIntrinsicMatrix(double height, double width, bool usingNormalized)
+    {
+        float fov = 60.0f;
+        float focalLength = (float)height / (2.0f * Mathf.Tan(0.5f * fov * Mathf.Deg2Rad));
+
+        double fx = focalLength;
+        double fy = focalLength;
+
+        double cy = height / 2.0;
+        double cx = width / 2.0;
+
+        if (usingNormalized)
+        {
+            fx = fx / width;
+            fy = fy / height;
+            cy = cy / height;
+            cx = cx / width;
+        }
+
+        double[] intrGuess = new double[] { fx, 0.0, cx, 
+            0.0, fy, cy, 
+            0.0, 0.0, 1.0 };
+
+        return new CvMat(3, 3, MatrixType.F64C1, intrGuess);
+    }
+
+    private CvMat PutObjectPointsIntoCVMat(List<Vector3> _objectPositions, int pointsCount, int ImageNum)
+    {
+        CvPoint3D32f[,] objects = new CvPoint3D32f[ImageNum, pointsCount];
+
+        for (int i = 0; i < pointsCount; i++)
+        {
+            objects[0, i] = new CvPoint3D32f
+            {
+                X = _objectPositions[i].x,
+                Y = _objectPositions[i].y,
+                Z = _objectPositions[i].z * -1
+            };
+        }
+
+        return new CvMat(pointsCount, 3, MatrixType.F32C1, objects);
+    }
+
+    private CvMat PutImagePointsIntoCVMat(List<Vector3> _imagePositions, int pointsCount)
+    {
+        List<CvPoint2D32f> allCorners = new List<CvPoint2D32f>(pointsCount);
+
+        for (int i = 0; i < _imagePositions.Count; i++)
+        {
+            allCorners.Add(new CvPoint2D32f(_imagePositions[i].x, _imagePositions[i].y));
+        }
+
+        return new CvMat(pointsCount, 1, MatrixType.F32C2, allCorners.ToArray());
     }
 	
 	// Update is called once per frame
