@@ -5,8 +5,11 @@ using OpenCvSharp.CPlusPlus;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Assets;
 
 public class Calibration : MonoBehaviour {
+    // NB some code adapted from OpenCVSharp camera calibration example:
+    // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
 
     public Camera projectorCamera;
     public Camera _mainCamera;
@@ -40,7 +43,7 @@ public class Calibration : MonoBehaviour {
         CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess );
         prevIntrinsic = intrinsic;
 
         CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
@@ -48,37 +51,35 @@ public class Calibration : MonoBehaviour {
 
         Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation_, translation_, false);
 
-        // NB code is mostly from:
-        // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
-
-        //CvMat rotInv = new CvMat(3, 3, MatrixType.F32C1);
-        //rotationFull.Invert(rotInv as CvArr);
-
         CvMat rotationFull = new CvMat(3, 3, MatrixType.F32C1);
-        Cv.Rodrigues2(rotation_, rotationFull);
+        Cv.Rodrigues2(rotation_, rotationFull); // get full rotation matrix from rotation vector
 
         float[] LHSflipBackMatrix = new float[] { 1.0f, 0.0f, 0.0f, 
             0.0f, 1.0f, 0.0f, 
             0.0f, 0.0f, -1.0f };
         CvMat LHSflipBackMatrixM = new CvMat(3, 3, MatrixType.F32C1, LHSflipBackMatrix);
         CvMat rotLHS = rotationFull * LHSflipBackMatrixM; // invert Z (as we did before when savings points) to get from RHS -> LHS
+        CvMat rotTran = rotLHS.Transpose(); // transpose is same as inverse for rotation matrix
+        CvMat transTran = translation_.Transpose(); // to get in right format
+        CvMat rotFinal = (rotTran * -1);
 
-        CvMat rotTran = rotLHS.Transpose();
-        CvMat transTran = translation_.Transpose();
-        CvMat rotFin = (rotTran * -1);
+        CvMat transFinal = rotFinal * transTran;
 
-        CvMat transFinal = rotFin * transTran;
+        Rotation r = RotationConversion.RToEulerZXY(rotTran);
 
-        Assets.Rotation r = Assets.RotationConversion.RToEulerZXY(rotTran);
+        ApplyTranslationAndRotationToCamera(transFinal, r);
+    }
 
-        double x = transFinal[0, 0];
-        double y = transFinal[0, 1];
-        double z = transFinal[0, 2];
+    private void ApplyTranslationAndRotationToCamera(CvMat translation, Rotation r)
+    {
+        double tx = translation[0, 0];
+        double ty = translation[0, 1];
+        double tz = translation[0, 2];
 
-        projectorCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
+        projectorCamera.transform.position = new Vector3((float)tx, (float)ty, (float)tz);
         projectorCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
 
-        _mainCamera.transform.position = new Vector3((float)x, (float)y, (float)z);
+        _mainCamera.transform.position = new Vector3((float)tx, (float)ty, (float)tz);
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
     }
 
