@@ -43,8 +43,8 @@ public class Calibration : MonoBehaviour {
         CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.UseIntrinsicGuess );
-        prevIntrinsic = intrinsic;
+        // Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
+        // prevIntrinsic = intrinsic;
 
         CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
@@ -68,6 +68,32 @@ public class Calibration : MonoBehaviour {
         Rotation r = RotationConversion.RToEulerZXY(rotTran);
 
         ApplyTranslationAndRotationToCamera(transFinal, r);
+        ApplyIntrinsicToCamera(intrinsic, height, width, usingNormalized);
+    }
+
+    private void ApplyIntrinsicToCamera(CvMat intrinsic, double height, double width, bool usingNormalized)
+    {
+        double fx = intrinsic[0, 0];
+        double fy = intrinsic[1, 1];
+        double cx = intrinsic[0, 2];
+        double cy = intrinsic[1, 2];
+
+        if (usingNormalized)
+        {
+            fx *= width;
+            fy *= height;
+            cx *= width;
+            cy *= height;
+        }
+
+        // NB This is the vertical field of view; horizontal FOV varies depending on the viewport's aspect ratio
+        // from http://docs.unity3d.com/ScriptReference/Camera-fieldOfView.html
+
+        float fov = Mathf.Rad2Deg * 2.0f * Mathf.Atan((float) (height / (2.0 * fy)));
+        projectorCamera.fieldOfView = fov;
+        _mainCamera.fieldOfView = fov;
+
+        // apply princial point if different from centre of image?
     }
 
     private void ApplyTranslationAndRotationToCamera(CvMat translation, Rotation r)
@@ -85,11 +111,25 @@ public class Calibration : MonoBehaviour {
 
     private CvMat createIntrinsicMatrix(double height, double width, bool usingNormalized)
     {
-        float fov = 60.0f;
+        float heightf = (float) height;
+        float widthf = (float) width;
+
+        float fov = _mainCamera.fieldOfView;
         float focalLength = (float)height / (2.0f * Mathf.Tan(0.5f * fov * Mathf.Deg2Rad));
 
-        double fx = focalLength;
-        double fy = focalLength;
+        // from https://docs.google.com/spreadsheet/ccc?key=0AuC4NW61c3-cdDFhb1JxWUFIVWpEdXhabFNjdDJLZXc#gid=0
+
+        float hfov = 91.2705674249382f;
+        float vfov = 59.8076333281726f;
+
+        double fx = (double)((float)width / (2.0f * Mathf.Tan(0.5f * hfov * Mathf.Deg2Rad)));
+        double fy = (double)((float)height / (2.0f * Mathf.Tan(0.5f * vfov * Mathf.Deg2Rad))); // ???
+
+        float fxf = (float)fx;
+        float fyf = (float)fy;
+
+        //double fx = 21.258992220068404; // FoV (91) -> focal length (http://www.bdimitrov.de/kmp/technology/fov.html)
+        //double fy = 37.469987986050846; // FoV (60) -> focal length (http://www.bdimitrov.de/kmp/technology/fov.html)
 
         double cy = height / 2.0;
         double cx = width / 2.0;
@@ -142,34 +182,4 @@ public class Calibration : MonoBehaviour {
 	void Update () {
 	
 	}
-
-
-    private string ShowMatrix(CvMat mat)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < mat.Rows; x++)
-        {
-            for (int y = 0; y < mat.Cols; y++)
-            {
-                sb.Append(mat[x, y] + " ");
-            }
-            sb.AppendLine("");
-        }
-        return sb.ToString();
-    }
-
-    private string Form(CvPoint3D32f[,] ar)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ar.Length; i++)
-        {
-            sb.Append(Form(ar[0,i]));
-        }
-        return sb.ToString();
-    }
-
-    private string Form(CvPoint3D32f s)
-    {
-        return "" + s.X + ", " + s.Y + ", " + s.Z + ", ";
-    }
 }

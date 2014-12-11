@@ -73,7 +73,7 @@ public class CrossHair : MonoBehaviour
 
                 if (_imagePositions.Count >= minNumberOfPoints)
                 {
-                    plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+                    plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
                 }
                 occludeWorld = false;
             }
