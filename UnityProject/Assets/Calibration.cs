@@ -43,8 +43,8 @@ public class Calibration : MonoBehaviour {
         CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        // Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
-        // prevIntrinsic = intrinsic;
+        //Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
+        //prevIntrinsic = intrinsic;
 
         CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
@@ -93,7 +93,7 @@ public class Calibration : MonoBehaviour {
         projectorCamera.fieldOfView = fov;
         _mainCamera.fieldOfView = fov;
 
-        // apply princial point if different from centre of image?
+        // TODO: apply princial point if different from centre of image? Could put camera inside empty game object and translate x,y by PP difference?
     }
 
     private void ApplyTranslationAndRotationToCamera(CvMat translation, Rotation r)
@@ -111,25 +111,13 @@ public class Calibration : MonoBehaviour {
 
     private CvMat createIntrinsicMatrix(double height, double width, bool usingNormalized)
     {
-        float heightf = (float) height;
-        float widthf = (float) width;
-
-        float fov = _mainCamera.fieldOfView;
-        float focalLength = (float)height / (2.0f * Mathf.Tan(0.5f * fov * Mathf.Deg2Rad));
-
         // from https://docs.google.com/spreadsheet/ccc?key=0AuC4NW61c3-cdDFhb1JxWUFIVWpEdXhabFNjdDJLZXc#gid=0
-
+        // taken from http://www.neilmendoza.com/projector-field-view-calculator/
         float hfov = 91.2705674249382f;
         float vfov = 59.8076333281726f;
 
         double fx = (double)((float)width / (2.0f * Mathf.Tan(0.5f * hfov * Mathf.Deg2Rad)));
-        double fy = (double)((float)height / (2.0f * Mathf.Tan(0.5f * vfov * Mathf.Deg2Rad))); // ???
-
-        float fxf = (float)fx;
-        float fyf = (float)fy;
-
-        //double fx = 21.258992220068404; // FoV (91) -> focal length (http://www.bdimitrov.de/kmp/technology/fov.html)
-        //double fy = 37.469987986050846; // FoV (60) -> focal length (http://www.bdimitrov.de/kmp/technology/fov.html)
+        double fy = (double)((float)height / (2.0f * Mathf.Tan(0.5f * vfov * Mathf.Deg2Rad)));
 
         double cy = height / 2.0;
         double cx = width / 2.0;
