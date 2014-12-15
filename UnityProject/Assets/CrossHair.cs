@@ -11,6 +11,7 @@ public class CrossHair : MonoBehaviour
     List<Vector3> _normalizedImagePositions = new List<Vector3>();
     public int minNumberOfPoints = 8;
     private bool occludeWorld;
+    private bool usingNormalised = false;
 
     // Use this for initialization
     void Start()
@@ -57,8 +58,7 @@ public class CrossHair : MonoBehaviour
                 RaycastHit hit3d;
                 if (Physics.Raycast(ray, out hit3d))
                 {
-                    GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position = hit3d.point;
+                    CreateSphereAt(hit3d.point);
                     _objectPositions.Add(hit3d.point);
                     occludeWorld = true;
                 }
@@ -71,17 +71,53 @@ public class CrossHair : MonoBehaviour
                 _imagePositions.Add(pos);
                _normalizedImagePositions.Add(normalise(pos));
 
-                if (_imagePositions.Count >= minNumberOfPoints)
-                {
-                    plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
-                }
+                TriggerCalibration();
+
                 occludeWorld = false;
             }
         }
     }
 
+    private static void CreateSphereAt(Vector3 point)
+    {
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere.transform.position = point;
+    }
+
+    private void TriggerCalibration()
+    {
+        if (_imagePositions.Count < minNumberOfPoints)
+            return;
+        if (_imagePositions.Count != _objectPositions.Count)
+            return;
+
+        if(usingNormalised)
+            plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
+        else
+            plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+    }
+
     private Vector3 normalise(Vector3 pos)
     {
         return new Vector3(pos.x / (float) Screen.width, pos.y / (float) Screen.height);
+    }
+
+    public List<Vector3> GetImagePoints()
+    {
+        return _imagePositions;
+    }
+
+    public List<Vector3> GetWorldPoints()
+    {
+        return _objectPositions;
+    }
+
+    public void ReplayRecordedPoints(List<Vector3> worldPoints, List<Vector3> imgPoints)
+    {
+        _imagePositions = imgPoints;
+        _objectPositions = worldPoints;
+        foreach (var point in worldPoints)
+            CreateSphereAt(point);
+        TriggerCalibration();
     }
 }

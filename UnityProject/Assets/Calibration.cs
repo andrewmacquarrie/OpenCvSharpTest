@@ -43,8 +43,8 @@ public class Calibration : MonoBehaviour {
         CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        //Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
-        //prevIntrinsic = intrinsic;
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
+        prevIntrinsic = intrinsic;
 
         CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);

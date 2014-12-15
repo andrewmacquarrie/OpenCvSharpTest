@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ArrayOfSerializableVector3 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SerializableVector3>
+    <X>-6.146045</X>
+    <Y>2.75</Y>
+    <Z>-0.8487512</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>0.426387</X>
+    <Y>2.75</Y>
+    <Z>-2.464082</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>4.24453</X>
+    <Y>2.75</Y>
+    <Z>-1.669271</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>6.69875</X>
+    <Y>7.452652</Y>
+    <Z>2.393042</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>11.11283</X>
+    <Y>7.335407</Y>
+    <Z>1.226381</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>13.9649</X>
+    <Y>2.119924</Y>
+    <Z>2.616021</Z>
+  </SerializableVector3>
+  <SerializableVector3>
+    <X>2.778656</X>
+    <Y>-1.235385</Y>
+    <Z>-3.37377</Z>
+  </SerializableVector3>
+</ArrayOfSerializableVector3>
