@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Assets;
 using System.Xml.Serialization;
 using System.IO;
+using UnityEditor;
 
 public class PointsRecordReplay : MonoBehaviour {
     public CrossHair pointsHolder;
@@ -17,20 +18,30 @@ public class PointsRecordReplay : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.R))
         {
+            var filenamePrefix = GetFilenamePrefix();
+
             var imagePoints = pointsHolder.GetImagePoints();
-            SaveToFile(imagePoints, "imagePointsRecording.xml");
+            SaveToFile(imagePoints, filenamePrefix + "ImagePointsRecording.xml");
 
             var worldPoints = pointsHolder.GetWorldPoints();
-            SaveToFile(worldPoints, "worldPointsRecording.xml");
+            SaveToFile(worldPoints, filenamePrefix + "WorldPointsRecording.xml");
 
             Debug.Log("Recording complete");
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            pointsHolder.ReplayRecordedPoints(GetPointsFromFile("worldPointsRecording.xml"), GetPointsFromFile("imagePointsRecording.xml"));
+            var filenamePrefix = GetFilenamePrefix();
+            pointsHolder.ReplayRecordedPoints(GetPointsFromFile(filenamePrefix + "WorldPointsRecording.xml"), GetPointsFromFile(filenamePrefix + "ImagePointsRecording.xml"));
         }
 	}
+
+    private static string GetFilenamePrefix()
+    {
+        var path = EditorUtility.SaveFilePanel("Choose the file path", "", "prefix", "xml");
+        var filenamePrefix = Path.GetFileName(path);
+        return filenamePrefix.Replace(".xml","");
+    }
 
     private List<Vector3> GetPointsFromFile(string filename)
     {
