@@ -18,57 +18,30 @@ public class PointsRecordReplay : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            var filenamePrefix = GetFilenamePrefix();
+            var fileName = EditorUtility.SaveFilePanel("Choose the file path", "", "pointsRecording", "xml");
 
             var imagePoints = pointsHolder.GetImagePoints();
-            SaveToFile(imagePoints, filenamePrefix + "ImagePointsRecording.xml");
-
             var worldPoints = pointsHolder.GetWorldPoints();
-            SaveToFile(worldPoints, filenamePrefix + "WorldPointsRecording.xml");
+            var normalizedImagePoints = pointsHolder.GetNormalizedImagePoints();
+            SaveToFile(imagePoints, normalizedImagePoints, worldPoints, fileName);
 
             Debug.Log("Recording complete");
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            var filenamePrefix = GetFilenamePrefix();
-            pointsHolder.ReplayRecordedPoints(GetPointsFromFile(filenamePrefix + "WorldPointsRecording.xml"), GetPointsFromFile(filenamePrefix + "ImagePointsRecording.xml"));
+            var fileName = EditorUtility.OpenFilePanel("Choose the file path", "", "xml");
+            var recording = Recording.LoadFromFile(fileName);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3);
+
+            Debug.Log("Loading complete");
         }
 	}
 
-    private static string GetFilenamePrefix()
+    // (imagePoints, normalizedImagePoints, worldPoints, filenamePrefix
+    private static void SaveToFile(List<Vector3> imagePoints, List<Vector3> normalizedImagePoints, List<Vector3> worldPoints, string fileName)
     {
-        var path = EditorUtility.SaveFilePanel("Choose the file path", "", "prefix", "xml");
-        var filenamePrefix = Path.GetFileName(path);
-        return filenamePrefix.Replace(".xml","");
+        var recording = new Recording(imagePoints, normalizedImagePoints, worldPoints);
+        recording.SaveToFile(fileName);
     }
-
-    private List<Vector3> GetPointsFromFile(string filename)
-    {
-        var imagePointsString = System.IO.File.ReadAllText(filename);
-        XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<SerializableVector3>));
-        using (StringReader textReader = new StringReader(imagePointsString))
-        {
-            var list = (List<SerializableVector3>)xmlSerializer.Deserialize(textReader);
-
-            var convList = new List<Vector3>();
-            foreach (var sv3 in list)
-            {
-                convList.Add(sv3.Vector3);
-            }
-            return convList;
-        }
-    }
-
-    private static void SaveToFile(List<Vector3> imagePoints, string fileName)
-    {
-        List<SerializableVector3> serializableImageList = new List<SerializableVector3>();
-        foreach (var imagePoint in imagePoints)
-        {
-            serializableImageList.Add(new SerializableVector3(imagePoint));
-        }
-        System.IO.File.WriteAllText(fileName, serializableImageList.SerializeObject());
-    }
-
-
 }

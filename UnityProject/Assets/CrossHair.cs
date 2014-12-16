@@ -120,4 +120,9 @@ public class CrossHair : MonoBehaviour
             CreateSphereAt(point);
         TriggerCalibration();
     }
+
+    public List<Vector3> GetNormalizedImagePoints()
+    {
+        return _normalizedImagePositions;
+    }
 }

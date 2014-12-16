@@ -60,6 +60,7 @@
     <Compile Include="Assets\CrossHair.cs" />
     <Compile Include="Assets\MyExtensions.cs" />
     <Compile Include="Assets\PointsRecordReplay.cs" />
+    <Compile Include="Assets\Recording.cs" />
     <Compile Include="Assets\Rotation.cs" />
     <Compile Include="Assets\RotationConversion.cs" />
     <Compile Include="Assets\SerializableVector3.cs" />
