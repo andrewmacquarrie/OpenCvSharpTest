@@ -14,15 +14,17 @@ namespace Assets
         // needed for serialization
         public Recording() { }
 
-        public Recording(List<Vector3> ip, List<Vector3> nip, List<Vector3> wp){
+        public Recording(List<Vector3> ip, List<Vector3> nip, List<Vector3> wp, bool norm){
             imagePoints = ConvertToSerializableList(ip);
             normalizedImagePoints = ConvertToSerializableList(nip);
             worldPoints = ConvertToSerializableList(wp);
+            normalized = norm;
         }
 
         public List<SerializableVector3> worldPoints;
         public List<SerializableVector3> imagePoints;
         public List<SerializableVector3> normalizedImagePoints;
+        public bool normalized;
 
         public List<Vector3> worldPointsV3
         {

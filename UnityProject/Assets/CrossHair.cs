@@ -112,10 +112,12 @@ public class CrossHair : MonoBehaviour
         return _objectPositions;
     }
 
-    public void ReplayRecordedPoints(List<Vector3> worldPoints, List<Vector3> imgPoints)
+    public void ReplayRecordedPoints(List<Vector3> worldPoints, List<Vector3> imgPoints, List<Vector3> normImgPoints, bool usingNorm)
     {
         _imagePositions = imgPoints;
         _objectPositions = worldPoints;
+        _normalizedImagePositions = normImgPoints;
+        usingNormalised = usingNorm;
         foreach (var point in worldPoints)
             CreateSphereAt(point);
         TriggerCalibration();
@@ -124,5 +126,10 @@ public class CrossHair : MonoBehaviour
     public List<Vector3> GetNormalizedImagePoints()
     {
         return _normalizedImagePositions;
+    }
+
+    public bool  GetNormalizedFlag()
+    {
+        return usingNormalised;
     }
 }

@@ -40,16 +40,19 @@ public class Calibration : MonoBehaviour {
             intrinsic = prevIntrinsic;
 
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
-        CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
-        CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
-
-        //Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation, CalibrationFlag.FixIntrinsic | CalibrationFlag.UseIntrinsicGuess );
-        //prevIntrinsic = intrinsic;
-
+        
         CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
 
         Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation_, translation_, false);
+
+        //CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
+        //CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
+
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixAspectRatio | CalibrationFlag.FixPrincipalPoint);
+        prevIntrinsic = intrinsic;
+
+
 
         CvMat rotationFull = new CvMat(3, 3, MatrixType.F32C1);
         Cv.Rodrigues2(rotation_, rotationFull); // get full rotation matrix from rotation vector
