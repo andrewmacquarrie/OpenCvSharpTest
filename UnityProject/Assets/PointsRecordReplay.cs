@@ -46,6 +46,22 @@ public class PointsRecordReplay : MonoBehaviour {
 
             Debug.Log("Loading complete");
         }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            string fileName;
+            #if UNITY_EDITOR
+                fileName = EditorUtility.OpenFilePanel("Choose the file path", "", "xml");
+            #endif
+            #if UNITY_EDITOR == false
+                fileName = "recording.xml";
+            #endif
+            var recording = Recording.LoadFromFile(fileName);
+            Screen.SetResolution(1906, 987, false);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3, recording.normalizedImagePointsV3, recording.normalized);
+
+            Debug.Log("Loading complete");
+        }
 	}
 
     // (imagePoints, normalizedImagePoints, worldPoints, filenamePrefix

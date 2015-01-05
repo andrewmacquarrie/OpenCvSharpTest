@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class CrossHair : MonoBehaviour
 {
@@ -12,11 +13,23 @@ public class CrossHair : MonoBehaviour
     public int minNumberOfPoints = 8;
     private bool occludeWorld;
     private bool usingNormalised = false;
+    private int _width;
+    private int _height;
 
     // Use this for initialization
     void Start()
     {
         occludeWorld = false;
+
+#if UNITY_EDITOR
+        Vector2 hw = Handles.GetMainGameViewSize();
+        _height = (int)hw.y;
+        _width = (int)hw.x;
+#endif
+#if UNITY_EDITOR == false
+        _height = (double)Screen.height;
+        _width = (double)Screen.width;
+#endif
     }
 
     // Update is called once per frame
@@ -30,9 +43,9 @@ public class CrossHair : MonoBehaviour
         {
             Texture2D blackTexture = new Texture2D(1, 1);
             blackTexture.SetPixel(0, 0, Color.black);
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), blackTexture);
+            GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
         }
-        GUI.DrawTexture(new Rect(pos.x - hw, Screen.height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
+        GUI.DrawTexture(new Rect(pos.x - hw, _height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
 
         _imagePositions.ForEach(delegate(Vector3 position)
         {
@@ -67,7 +80,7 @@ public class CrossHair : MonoBehaviour
             {
                 // we already have an object position, now we collect the 2D correspondence
                 Vector3 pos = Input.mousePosition;
-                pos.y = Screen.height - pos.y; // note the screen pos starts bottom left. We want top left origin
+                pos.y = _height - pos.y; // note the screen pos starts bottom left. We want top left origin
                 _imagePositions.Add(pos);
                _normalizedImagePositions.Add(normalise(pos));
 
@@ -99,7 +112,7 @@ public class CrossHair : MonoBehaviour
 
     private Vector3 normalise(Vector3 pos)
     {
-        return new Vector3(pos.x / (float) Screen.width, pos.y / (float) Screen.height);
+        return new Vector3(pos.x / (float) _width, pos.y / (float) _height);
     }
 
     public List<Vector3> GetImagePoints()

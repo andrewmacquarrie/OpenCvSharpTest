@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Assets;
+using UnityEditor;
 
 public class Calibration : MonoBehaviour {
     // NB some code adapted from OpenCVSharp camera calibration example:
@@ -17,8 +18,17 @@ public class Calibration : MonoBehaviour {
 
     public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
+#if UNITY_EDITOR
+        Vector2 hw = Handles.GetMainGameViewSize();
+        double height = (double)hw.y;
+        double width = (double)hw.x;
+#endif
+#if UNITY_EDITOR == false
         double height = (double)Screen.height;
         double width = (double)Screen.width;
+#endif
+
+
         int pointsCount = _imagePositions.Count;
         int numImages = 1;
         int[] pointCountsValue = new int[numImages];
