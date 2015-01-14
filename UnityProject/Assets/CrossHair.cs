@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class CrossHair : MonoBehaviour
 {
@@ -27,8 +29,8 @@ public class CrossHair : MonoBehaviour
         _width = (int)hw.x;
 #endif
 #if UNITY_EDITOR == false
-        _height = (double)Screen.height;
-        _width = (double)Screen.width;
+        _height = (int)Screen.height;
+        _width = (int)Screen.width;
 #endif
     }
 

@@ -3,111 +3,126 @@
   <worldPoints>
     <SerializableVector3>
       <X>-5.125</X>
-      <Y>1.392226</Y>
-      <Z>1.322495</Z>
+      <Y>1.38206</Y>
+      <Z>1.320233</Z>
     </SerializableVector3>
     <SerializableVector3>
       <X>-5.125</X>
-      <Y>1.382006</Y>
-      <Z>-1.274682</Z>
+      <Y>1.38891</Y>
+      <Z>-1.332635</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>2.365024</X>
-      <Y>7.081303</Y>
-      <Z>1.331257</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>2.353838</X>
-      <Y>7.051861</Y>
-      <Z>-1.39</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>5.026776</X>
-      <Y>7.048282</Y>
-      <Z>-1.39</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>5.1085</X>
-      <Y>-1.385877</Y>
+      <X>2.392621</X>
+      <Y>1.391935</Y>
       <Z>-1.35</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>-5.125</X>
-      <Y>-1.333437</Y>
-      <Z>-1.335463</Z>
+      <X>2.346708</X>
+      <Y>7.03546</Y>
+      <Z>-1.367231</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>2.380799</X>
+      <Y>7.081303</Y>
+      <Z>1.353626</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>5.031255</X>
+      <Y>-1.397714</Y>
+      <Z>-1.35</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>5.070769</X>
+      <Y>7.044157</Y>
+      <Z>-1.39</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>-5.109406</X>
+      <Y>-1.36384</Y>
+      <Z>-1.35</Z>
     </SerializableVector3>
   </worldPoints>
   <imagePoints>
     <SerializableVector3>
-      <X>646</X>
-      <Y>633</Y>
+      <X>835</X>
+      <Y>896</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>665</X>
-      <Y>638</Y>
+      <X>866</X>
+      <Y>904</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>758</X>
-      <Y>530</Y>
+      <X>1019</X>
+      <Y>892</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>781</X>
-      <Y>532</Y>
+      <X>1029</X>
+      <Y>746</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>816</X>
-      <Y>530</Y>
+      <X>991</X>
+      <Y>745</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>806</X>
-      <Y>670</Y>
+      <X>1063</X>
+      <Y>948</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>666</X>
-      <Y>685</Y>
+      <X>1077</X>
+      <Y>746</Y>
+      <Z>0</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>869</X>
+      <Y>971</Y>
       <Z>0</Z>
     </SerializableVector3>
   </imagePoints>
   <normalizedImagePoints>
     <SerializableVector3>
-      <X>0.4729136</X>
-      <Y>0.8242188</Y>
+      <X>0.4348958</X>
+      <Y>0.8296296</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.4868228</X>
-      <Y>0.8307292</Y>
+      <X>0.4510417</X>
+      <Y>0.837037</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5549048</X>
-      <Y>0.6901042</Y>
+      <X>0.5307292</X>
+      <Y>0.8259259</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5717423</X>
-      <Y>0.6927083</Y>
+      <X>0.5359375</X>
+      <Y>0.6907408</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5973645</X>
-      <Y>0.6901042</Y>
+      <X>0.5161458</X>
+      <Y>0.6898148</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5900439</X>
-      <Y>0.8723958</Y>
+      <X>0.5536458</X>
+      <Y>0.8777778</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.4875549</X>
-      <Y>0.8919271</Y>
+      <X>0.5609375</X>
+      <Y>0.6907408</Y>
+      <Z>0</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>0.4526042</X>
+      <Y>0.8990741</Y>
       <Z>0</Z>
     </SerializableVector3>
   </normalizedImagePoints>
@@ -115,111 +130,126 @@
   <worldPointsV3>
     <Vector3>
       <x>-5.125</x>
-      <y>1.392226</y>
-      <z>1.322495</z>
+      <y>1.38206</y>
+      <z>1.320233</z>
     </Vector3>
     <Vector3>
       <x>-5.125</x>
-      <y>1.382006</y>
-      <z>-1.274682</z>
+      <y>1.38891</y>
+      <z>-1.332635</z>
     </Vector3>
     <Vector3>
-      <x>2.365024</x>
-      <y>7.081303</y>
-      <z>1.331257</z>
-    </Vector3>
-    <Vector3>
-      <x>2.353838</x>
-      <y>7.051861</y>
-      <z>-1.39</z>
-    </Vector3>
-    <Vector3>
-      <x>5.026776</x>
-      <y>7.048282</y>
-      <z>-1.39</z>
-    </Vector3>
-    <Vector3>
-      <x>5.1085</x>
-      <y>-1.385877</y>
+      <x>2.392621</x>
+      <y>1.391935</y>
       <z>-1.35</z>
     </Vector3>
     <Vector3>
-      <x>-5.125</x>
-      <y>-1.333437</y>
-      <z>-1.335463</z>
+      <x>2.346708</x>
+      <y>7.03546</y>
+      <z>-1.367231</z>
+    </Vector3>
+    <Vector3>
+      <x>2.380799</x>
+      <y>7.081303</y>
+      <z>1.353626</z>
+    </Vector3>
+    <Vector3>
+      <x>5.031255</x>
+      <y>-1.397714</y>
+      <z>-1.35</z>
+    </Vector3>
+    <Vector3>
+      <x>5.070769</x>
+      <y>7.044157</y>
+      <z>-1.39</z>
+    </Vector3>
+    <Vector3>
+      <x>-5.109406</x>
+      <y>-1.36384</y>
+      <z>-1.35</z>
     </Vector3>
   </worldPointsV3>
   <imagePointsV3>
     <Vector3>
-      <x>646</x>
-      <y>633</y>
+      <x>835</x>
+      <y>896</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>665</x>
-      <y>638</y>
+      <x>866</x>
+      <y>904</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>758</x>
-      <y>530</y>
+      <x>1019</x>
+      <y>892</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>781</x>
-      <y>532</y>
+      <x>1029</x>
+      <y>746</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>816</x>
-      <y>530</y>
+      <x>991</x>
+      <y>745</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>806</x>
-      <y>670</y>
+      <x>1063</x>
+      <y>948</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>666</x>
-      <y>685</y>
+      <x>1077</x>
+      <y>746</y>
+      <z>0</z>
+    </Vector3>
+    <Vector3>
+      <x>869</x>
+      <y>971</y>
       <z>0</z>
     </Vector3>
   </imagePointsV3>
   <normalizedImagePointsV3>
     <Vector3>
-      <x>0.4729136</x>
-      <y>0.8242188</y>
+      <x>0.4348958</x>
+      <y>0.8296296</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.4868228</x>
-      <y>0.8307292</y>
+      <x>0.4510417</x>
+      <y>0.837037</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.5549048</x>
-      <y>0.6901042</y>
+      <x>0.5307292</x>
+      <y>0.8259259</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.5717423</x>
-      <y>0.6927083</y>
+      <x>0.5359375</x>
+      <y>0.6907408</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.5973645</x>
-      <y>0.6901042</y>
+      <x>0.5161458</x>
+      <y>0.6898148</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.5900439</x>
-      <y>0.8723958</y>
+      <x>0.5536458</x>
+      <y>0.8777778</y>
       <z>0</z>
     </Vector3>
     <Vector3>
-      <x>0.4875549</x>
-      <y>0.8919271</y>
+      <x>0.5609375</x>
+      <y>0.6907408</y>
+      <z>0</z>
+    </Vector3>
+    <Vector3>
+      <x>0.4526042</x>
+      <y>0.8990741</y>
       <z>0</z>
     </Vector3>
   </normalizedImagePointsV3>

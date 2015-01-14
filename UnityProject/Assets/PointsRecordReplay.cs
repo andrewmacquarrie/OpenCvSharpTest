@@ -54,10 +54,10 @@ public class PointsRecordReplay : MonoBehaviour {
                 fileName = EditorUtility.OpenFilePanel("Choose the file path", "", "xml");
             #endif
             #if UNITY_EDITOR == false
-                fileName = "recording.xml";
+                fileName = "UnitTest2.xml";
             #endif
             var recording = Recording.LoadFromFile(fileName);
-            Screen.SetResolution(1906, 987, false);
+            Screen.SetResolution(1906, 987, true);
             pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3, recording.normalizedImagePointsV3, recording.normalized);
 
             Debug.Log("Loading complete");

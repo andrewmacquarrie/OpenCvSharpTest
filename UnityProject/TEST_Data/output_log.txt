@@ -15,7 +15,7 @@ Loading C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\OpenCvSharp.C
 Platform assembly: C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\OpenCvSharp.dll (this message is harmless)
 Loading C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\OpenCvSharp.dll into Unity Child Domain
 - Completed reload, in  0.202 seconds
-desktop: 1680x1050 60Hz; virtual: 3600x1080 at -1920,-30
+desktop: 1920x1080 60Hz; virtual: 3600x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 Platform assembly: C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\System.Xml.dll (this message is harmless)

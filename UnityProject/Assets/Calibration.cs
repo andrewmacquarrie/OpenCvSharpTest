@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Assets;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class Calibration : MonoBehaviour {
     // NB some code adapted from OpenCVSharp camera calibration example:
@@ -59,7 +61,7 @@ public class Calibration : MonoBehaviour {
         //CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         //CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_, CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixAspectRatio | CalibrationFlag.FixPrincipalPoint);
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixFocalLength | CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6);
         prevIntrinsic = intrinsic;
 
 
@@ -128,6 +130,11 @@ public class Calibration : MonoBehaviour {
         // taken from http://www.neilmendoza.com/projector-field-view-calculator/
         float hfov = 91.2705674249382f;
         float vfov = 59.8076333281726f;
+
+        // err taken temp from calibration-basic in mapamok
+        //float hfov = 57.35f;
+        //float vfov = 34.20f;
+
 
         double fx = (double)((float)width / (2.0f * Mathf.Tan(0.5f * hfov * Mathf.Deg2Rad)));
         double fy = (double)((float)height / (2.0f * Mathf.Tan(0.5f * vfov * Mathf.Deg2Rad)));
