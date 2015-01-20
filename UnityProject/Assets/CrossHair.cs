@@ -17,11 +17,13 @@ public class CrossHair : MonoBehaviour
     private bool usingNormalised = false;
     private int _width;
     private int _height;
+    private double _reprojError;
 
     // Use this for initialization
     void Start()
     {
         occludeWorld = false;
+        _reprojError = 0.0;
 
 #if UNITY_EDITOR
         Vector2 hw = Handles.GetMainGameViewSize();
@@ -56,7 +58,7 @@ public class CrossHair : MonoBehaviour
         });
 
 
-        GUI.Box(new Rect(10, 10, 100, 90), _imagePositions.Count.ToString());
+        GUI.Box(new Rect(10, 10, 150, 90), "# points: " + _imagePositions.Count.ToString() + "\nReProj error: " + string.Format("{0:f2}", _reprojError));
     }
 
     void Update()
@@ -107,9 +109,9 @@ public class CrossHair : MonoBehaviour
             return;
 
         if(usingNormalised)
-            plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
+            _reprojError = plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
         else
-            plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+            _reprojError = plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
     }
 
     private Vector3 normalise(Vector3 pos)

@@ -8,6 +8,7 @@ using System.IO;
 using Assets;
 #if UNITY_EDITOR
 using UnityEditor;
+using System;
 #endif
 
 public class Calibration : MonoBehaviour {
@@ -18,7 +19,7 @@ public class Calibration : MonoBehaviour {
     public Camera _mainCamera;
     private CvMat prevIntrinsic;
 
-    public void calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
+    public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
 #if UNITY_EDITOR
         Vector2 hw = Handles.GetMainGameViewSize();
@@ -67,7 +68,7 @@ public class Calibration : MonoBehaviour {
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  flags);
         prevIntrinsic = intrinsic;
 
-
+        double repojectionError = CalculateReprojectionError(_imagePositions, pointsCount, imagePoints, objectPoints, intrinsic, distortion, rotation_, translation_);
 
         CvMat rotationFull = new CvMat(3, 3, MatrixType.F32C1);
         Cv.Rodrigues2(rotation_, rotationFull); // get full rotation matrix from rotation vector
@@ -89,6 +90,26 @@ public class Calibration : MonoBehaviour {
         Rotation r = RotationConversion.RToEulerZXY(rotTran);
         ApplyTranslationAndRotationToCamera(transFinal, r);
         //ApplyIntrinsicToCamera(intrinsic, height, width, usingNormalized);
+
+        return repojectionError;
+    }
+
+    private double CalculateReprojectionError(List<Vector3> _imagePositions, int pointsCount, CvMat imagePoints, CvMat objectPoints, CvMat intrinsic, CvMat distortion, CvMat rotation_, CvMat translation_)
+    {
+        // openCV SSD taken from http://stackoverflow.com/questions/23781089/opencv-calibratecamera-2-reprojection-error-and-custom-computed-one-not-agree
+
+        CvMat imagePointsOut = PutImagePointsIntoCVMat(_imagePositions, pointsCount); // will be overwritten, but should be correct size. Hacky and slow imp
+        Cv.ProjectPoints2(objectPoints, rotation_, translation_, intrinsic, distortion, imagePointsOut);
+
+        var ar1 = imagePoints.ToArray();
+        var ar2 = imagePointsOut.ToArray();
+        double diff = 0.0f;
+        for (int i = 0; i < pointsCount; i++)
+        {
+            diff = diff + Math.Pow(Math.Abs(ar1[i].Val0 - ar2[i].Val0), 2.0) + Math.Pow(Math.Abs(ar1[i].Val1 - ar2[i].Val1), 2.0);
+        }
+        diff = Math.Sqrt(diff / pointsCount);
+        return diff;
     }
 
     private static Matrix4x4 CreateProjectionMatrixFromIntrinsic(double fx, double fy, double cx, double cy, Camera camera)
