@@ -44,7 +44,7 @@ public class Calibration : MonoBehaviour {
         Size size = new Size(width, height);
         if (usingNormalized)
             size = new Size(1, 1);
-        
+
         CvMat intrinsic;
         if (prevIntrinsic == null)
             intrinsic = createIntrinsicMatrix(height, width, usingNormalized);
@@ -61,7 +61,10 @@ public class Calibration : MonoBehaviour {
         //CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         //CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixFocalLength | CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6);
+        var flags = CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixFocalLength |
+            CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6;
+
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  flags);
         prevIntrinsic = intrinsic;
 
 
@@ -80,10 +83,61 @@ public class Calibration : MonoBehaviour {
 
         CvMat transFinal = rotFinal * transTran;
 
-        Rotation r = RotationConversion.RToEulerZXY(rotTran);
+        // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
+        _mainCamera.projectionMatrix = CreateProjectionMatrixFromIntrinsic(intrinsic[0, 0], intrinsic[1, 1], intrinsic[0, 2], intrinsic[1, 2], _mainCamera);
 
+        Rotation r = RotationConversion.RToEulerZXY(rotTran);
         ApplyTranslationAndRotationToCamera(transFinal, r);
-        ApplyIntrinsicToCamera(intrinsic, height, width, usingNormalized);
+        //ApplyIntrinsicToCamera(intrinsic, height, width, usingNormalized);
+    }
+
+    private static Matrix4x4 CreateProjectionMatrixFromIntrinsic(double fx, double fy, double cx, double cy, Camera camera)
+    {
+        // from http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+        // imp from http://pastebin.com/h8nYNWJY
+
+        double alpha = fx;
+        double beta = fy;
+        double skew = 0.0;
+        double u0 = cx;
+        double v0 = cy;
+ 
+        // These parameters define the final viewport that is rendered into by
+        // the camera.
+        double L = 0;
+        double R = camera.pixelWidth; // img_width;
+        double B = 0;
+        double T = camera.pixelHeight; // img_height;
+ 
+        // near and far clipping planes, these only matter for the mapping from
+        // world-space z-coordinate into the depth coordinate for OpenGL
+        double N = camera.nearClipPlane; // near_clip;
+        double F = camera.farClipPlane; // far_clip;
+     
+        // construct a projection matrix, this is identical to the
+        // projection matrix computed for the intrinsics, except an
+        // additional row is inserted to map the z-coordinate to
+        // OpenGL.
+        var persp = new Matrix4x4();
+        persp[0, 0] = (float) alpha;
+        persp[0, 1] = (float)skew;
+        persp[0, 2] = (float)-u0;
+        persp[1, 1] = (float)beta;
+        persp[1, 2] = (float)-v0;
+        persp[2, 2] = (float)N + (float)F;
+        persp[2, 3] = (float)N * (float)F;
+        persp[3, 2] = (float)-1.0;
+
+        var ortho = new Matrix4x4();
+        ortho[0, 0] = 2.0f / (float)(R - L); 
+        ortho[0, 3] = (float) (-(R + L) / (R - L));
+        ortho[1, 1] = 2.0f / (float)(T - B); 
+        ortho[1, 3] = (float) (-(T + B) / (T - B));
+        ortho[2, 2] = -2.0f / (float)(F - N); 
+        ortho[2, 3] = (float) (-(F + N) / (F - N));
+        ortho[3, 3] =  1.0f;
+
+        return ortho * persp;
     }
 
     private void ApplyIntrinsicToCamera(CvMat intrinsic, double height, double width, bool usingNormalized)
