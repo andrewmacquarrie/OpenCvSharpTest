@@ -94,6 +94,7 @@ public class Calibration : MonoBehaviour {
         return repojectionError;
     }
 
+
     private double CalculateReprojectionError(List<Vector3> _imagePositions, int pointsCount, CvMat imagePoints, CvMat objectPoints, CvMat intrinsic, CvMat distortion, CvMat rotation_, CvMat translation_)
     {
         // openCV SSD taken from http://stackoverflow.com/questions/23781089/opencv-calibratecamera-2-reprojection-error-and-custom-computed-one-not-agree
@@ -106,9 +107,9 @@ public class Calibration : MonoBehaviour {
         double diff = 0.0f;
         for (int i = 0; i < pointsCount; i++)
         {
-            diff = diff + Math.Pow(Math.Abs(ar1[i].Val0 - ar2[i].Val0), 2.0) + Math.Pow(Math.Abs(ar1[i].Val1 - ar2[i].Val1), 2.0);
+            diff = diff + System.Math.Pow(System.Math.Abs(ar1[i].Val0 - ar2[i].Val0), 2.0) + System.Math.Pow(System.Math.Abs(ar1[i].Val1 - ar2[i].Val1), 2.0);
         }
-        diff = Math.Sqrt(diff / pointsCount);
+        diff = System.Math.Sqrt(diff / pointsCount);
         return diff;
     }
 
