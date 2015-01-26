@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Assets\Calibration.cs" />
     <Compile Include="Assets\CrossHair.cs" />
+    <Compile Include="Assets\DrawLine.cs" />
     <Compile Include="Assets\MyExtensions.cs" />
     <Compile Include="Assets\PointsRecordReplay.cs" />
     <Compile Include="Assets\Recording.cs" />

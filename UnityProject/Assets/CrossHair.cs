@@ -49,7 +49,8 @@ public class CrossHair : MonoBehaviour
             blackTexture.SetPixel(0, 0, Color.black);
             GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
         }
-        GUI.DrawTexture(new Rect(pos.x - hw, _height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
+        
+        //GUI.DrawTexture(new Rect(pos.x - hw, _height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
 
         _imagePositions.ForEach(delegate(Vector3 position)
         {
