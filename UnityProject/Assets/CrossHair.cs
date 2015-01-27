@@ -9,12 +9,13 @@ public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
     public Calibration plugin;
+    public int minNumberOfPoints = 8;
+
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
     List<Vector3> _normalizedImagePositions = new List<Vector3>();
-    public int minNumberOfPoints = 8;
-    private bool occludeWorld;
-    private bool usingNormalised = false;
+    private bool _occludeWorld;
+    private bool _usingNormalised = false;
     private int _width;
     private int _height;
     private double _reprojError;
@@ -22,35 +23,32 @@ public class CrossHair : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        occludeWorld = false;
+        _occludeWorld = false;
         _reprojError = 0.0;
 
-#if UNITY_EDITOR
-        Vector2 hw = Handles.GetMainGameViewSize();
-        _height = (int)hw.y;
-        _width = (int)hw.x;
-#endif
-#if UNITY_EDITOR == false
-        _height = (int)Screen.height;
-        _width = (int)Screen.width;
-#endif
+        #if UNITY_EDITOR
+            Vector2 hw = Handles.GetMainGameViewSize();
+            _height = (int)hw.y;
+            _width = (int)hw.x;
+        #endif
+        #if UNITY_EDITOR == false
+            _height = (int)Screen.height;
+            _width = (int)Screen.width;
+        #endif
     }
 
     // Update is called once per frame
     void OnGUI()
     {
-        var hh = crosshairTexture.height / 2;
-        var hw = crosshairTexture.width / 2;
-
         var pos = Input.mousePosition;
-        if (occludeWorld)
+        if (_occludeWorld)
         {
             Texture2D blackTexture = new Texture2D(1, 1);
             blackTexture.SetPixel(0, 0, Color.black);
             GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
         }
         
-        //GUI.DrawTexture(new Rect(pos.x - hw, _height - pos.y - hh, crosshairTexture.width, crosshairTexture.height), crosshairTexture);
+        //GUI.DrawTexture(new Rect(pos.x - (crosshairTexture.width / 2), _height - pos.y - (crosshairTexture.height / 2), crosshairTexture.width, crosshairTexture.height), crosshairTexture);
 
         _imagePositions.ForEach(delegate(Vector3 position)
         {
@@ -72,28 +70,36 @@ public class CrossHair : MonoBehaviour
             if (_imagePositions.Count == _objectPositions.Count)
             {
                 // We have the same number of object and image positions, so we are starting a new correspondence. First is the object position
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit3d;
-                if (Physics.Raycast(ray, out hit3d))
-                {
-                    CreateSphereAt(hit3d.point);
-                    _objectPositions.Add(hit3d.point);
-                    occludeWorld = true;
-                }
+                CaptureWorldPoint();
             }
             else
             {
                 // we already have an object position, now we collect the 2D correspondence
-                Vector3 pos = Input.mousePosition;
-                pos.y = _height - pos.y; // note the screen pos starts bottom left. We want top left origin
-                _imagePositions.Add(pos);
-               _normalizedImagePositions.Add(normalise(pos));
-
+                CaptureImagePoint();
                 TriggerCalibration();
-
-                occludeWorld = false;
             }
         }
+    }
+
+    private void CaptureWorldPoint()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit3d;
+        if (Physics.Raycast(ray, out hit3d))
+        {
+            CreateSphereAt(hit3d.point);
+            _objectPositions.Add(hit3d.point);
+            _occludeWorld = true;
+        }
+    }
+
+    private void CaptureImagePoint()
+    {
+        Vector3 pos = Input.mousePosition;
+        pos.y = _height - pos.y; // note the screen pos starts bottom left. We want top left origin
+        _imagePositions.Add(pos);
+        _normalizedImagePositions.Add(normalise(pos));
+        _occludeWorld = false;
     }
 
     private static void CreateSphereAt(Vector3 point)
@@ -109,7 +115,7 @@ public class CrossHair : MonoBehaviour
         if (_imagePositions.Count != _objectPositions.Count)
             return;
 
-        if(usingNormalised)
+        if(_usingNormalised)
             _reprojError = plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
         else
             _reprojError = plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
@@ -135,7 +141,7 @@ public class CrossHair : MonoBehaviour
         _imagePositions = imgPoints;
         _objectPositions = worldPoints;
         _normalizedImagePositions = normImgPoints;
-        usingNormalised = usingNorm;
+        _usingNormalised = usingNorm;
         foreach (var point in worldPoints)
             CreateSphereAt(point);
         TriggerCalibration();
@@ -148,6 +154,6 @@ public class CrossHair : MonoBehaviour
 
     public bool  GetNormalizedFlag()
     {
-        return usingNormalised;
+        return _usingNormalised;
     }
 }
