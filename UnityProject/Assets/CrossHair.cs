@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
+// TODO: refactor so _height - pos.y is abstracted away
+
 public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
@@ -19,6 +21,7 @@ public class CrossHair : MonoBehaviour
     private int _width;
     private int _height;
     private double _reprojError;
+    private int? _dragging;
 
     // Use this for initialization
     void Start()
@@ -56,6 +59,12 @@ public class CrossHair : MonoBehaviour
             GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), crosshairTexture);
         });
 
+        if (ImagePointHighlighted())
+        {
+            int imagePointMarkerWidth = 10;
+            Vector3 position = _imagePositions[ImagePointMouseHooveringOver().Value];
+            GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), crosshairTexture);
+        }
 
         GUI.Box(new Rect(10, 10, 150, 90), "# points: " + _imagePositions.Count.ToString() + "\nReProj error: " + string.Format("{0:f2}", _reprojError));
     }
@@ -67,18 +76,58 @@ public class CrossHair : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (_imagePositions.Count == _objectPositions.Count)
+            if (ImagePointHighlighted())
             {
-                // We have the same number of object and image positions, so we are starting a new correspondence. First is the object position
-                CaptureWorldPoint();
+                // do something with highlighted point - allow click and drag?
+                _dragging = ImagePointMouseHooveringOver();
             }
             else
             {
-                // we already have an object position, now we collect the 2D correspondence
-                CaptureImagePoint();
-                TriggerCalibration();
+                if (_imagePositions.Count == _objectPositions.Count)
+                {
+                    // We have the same number of object and image positions, so we are starting a new correspondence. First is the object position
+                    CaptureWorldPoint();
+                }
+                else
+                {
+                    // we already have an object position, now we collect the 2D correspondence
+                    CaptureImagePoint();
+                    TriggerCalibration();
+                }
             }
         }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            _dragging = null;
+        }
+
+        if (_dragging != null)
+        {
+            var pos = Input.mousePosition;
+            pos.y = _height - pos.y;
+            _imagePositions[_dragging.Value] = pos;
+        }
+    }
+
+    private bool ImagePointHighlighted()
+    {
+        return ImagePointMouseHooveringOver() != null;
+    }
+
+    private int? ImagePointMouseHooveringOver()
+    {
+        Vector3 pos = Input.mousePosition;
+        int? imagePosMatch = null;
+        for (int i = 0; i < _imagePositions.Count; i++)
+        {
+            Vector3 imagePos = _imagePositions[i];
+            if (Mathf.Abs(imagePos.x - pos.x) + Mathf.Abs(imagePos.y - (_height - pos.y)) < 3)
+            {
+                imagePosMatch = i;
+            }
+        }
+        return imagePosMatch;
     }
 
     private void CaptureWorldPoint()
