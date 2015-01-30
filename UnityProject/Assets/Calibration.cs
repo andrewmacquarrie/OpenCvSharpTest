@@ -88,6 +88,7 @@ public class Calibration : MonoBehaviour {
         // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
        // _mainCamera.projectionMatrix = CreateProjectionMatrixFromIntrinsic(intrinsic[0, 0], intrinsic[1, 1], intrinsic[0, 2], intrinsic[1, 2], _mainCamera);
         _mainCamera.projectionMatrix = loadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
+        Debug.LogError(_mainCamera.projectionMatrix);
 
         Rotation r = RotationConversion.RToEulerZXY(rotTran);
         ApplyTranslationAndRotationToCamera(transFinal, r);
@@ -159,7 +160,24 @@ public class Calibration : MonoBehaviour {
 
         persp[3, 2] = D;
 
-        return persp.transpose; // see commend above
+        /*
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                persp[i, j] = i == j ? 1.0f : 0.0f;
+            }
+        }
+        persp[2, 3] = 0.0f;
+        persp[3, 3] = 1.0f;*/
+
+        var inv = new Matrix4x4();
+        inv[0, 0] = 1.0f;
+        inv[1, 1] = -1.0f;
+        inv[2, 2] = -1.0f;
+        inv[3, 3] = 1.0f;
+
+        return inv * persp.transpose; // see commend above
     }
 
     private static Matrix4x4 CreateProjectionMatrixFromIntrinsic(double fx, double fy, double cx, double cy, Camera camera)

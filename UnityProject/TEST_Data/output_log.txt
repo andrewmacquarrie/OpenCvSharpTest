@@ -20,6 +20,20 @@ desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Input initialized.
 Platform assembly: C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\System.Xml.dll (this message is harmless)
 Platform assembly: C:\Projects\OpenCvSharpTest\UnityProject\TEST_Data\Managed\System.dll (this message is harmless)
+1.02197	0.00000	-0.04044	0.00000
+0.00000	1.80369	-1.28643	0.00000
+0.00000	0.00000	1.00060	0.60018
+0.00000	0.00000	-1.00000	0.00000
+
+UnityEngine.Debug:Internal_Log(Int32, String, Object)
+UnityEngine.Debug:LogError(Object)
+Calibration:calibrateFromCorrespondences(List`1, List`1, Boolean) (at C:\Projects\OpenCvSharpTest\UnityProject\Assets\Calibration.cs:91)
+CrossHair:TriggerCalibration() (at C:\Projects\OpenCvSharpTest\UnityProject\Assets\CrossHair.cs:171)
+CrossHair:ReplayRecordedPoints(List`1, List`1, List`1, Boolean) (at C:\Projects\OpenCvSharpTest\UnityProject\Assets\CrossHair.cs:197)
+PointsRecordReplay:Update() (at C:\Projects\OpenCvSharpTest\UnityProject\Assets\PointsRecordReplay.cs:45)
+ 
+(Filename: C Line: 0)
+
 Loading complete
 UnityEngine.Debug:Internal_Log(Int32, String, Object)
 UnityEngine.Debug:Log(Object)
@@ -27,3 +41,4 @@ PointsRecordReplay:Update() (at C:\Projects\OpenCvSharpTest\UnityProject\Assets\
  
 (Filename: C Line: 0)
 
+Waiting for finish
