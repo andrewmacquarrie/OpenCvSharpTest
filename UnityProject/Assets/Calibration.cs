@@ -62,11 +62,12 @@ public class Calibration : MonoBehaviour {
         //CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
         //CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
 
-        var flags = CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | CalibrationFlag.FixFocalLength |
+        var flags = CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | 
             CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6;
 
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  flags);
-        prevIntrinsic = intrinsic;
+        
+        //prevIntrinsic = intrinsic;
 
         double repojectionError = CalculateReprojectionError(_imagePositions, pointsCount, imagePoints, objectPoints, intrinsic, distortion, rotation_, translation_);
 
@@ -85,7 +86,8 @@ public class Calibration : MonoBehaviour {
         CvMat transFinal = rotFinal * transTran;
 
         // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
-        _mainCamera.projectionMatrix = CreateProjectionMatrixFromIntrinsic(intrinsic[0, 0], intrinsic[1, 1], intrinsic[0, 2], intrinsic[1, 2], _mainCamera);
+       // _mainCamera.projectionMatrix = CreateProjectionMatrixFromIntrinsic(intrinsic[0, 0], intrinsic[1, 1], intrinsic[0, 2], intrinsic[1, 2], _mainCamera);
+        _mainCamera.projectionMatrix = loadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
 
         Rotation r = RotationConversion.RToEulerZXY(rotTran);
         ApplyTranslationAndRotationToCamera(transFinal, r);
@@ -93,7 +95,6 @@ public class Calibration : MonoBehaviour {
 
         return repojectionError;
     }
-
 
     private double CalculateReprojectionError(List<Vector3> _imagePositions, int pointsCount, CvMat imagePoints, CvMat objectPoints, CvMat intrinsic, CvMat distortion, CvMat rotation_, CvMat translation_)
     {
@@ -111,6 +112,54 @@ public class Calibration : MonoBehaviour {
         }
         diff = System.Math.Sqrt(diff / pointsCount);
         return diff;
+    }
+
+
+    private Matrix4x4 loadProjectionMatrix(Camera camera, float fx, float fy, float cx, float cy)
+    {
+        // https://github.com/kylemcdonald/ofxCv/blob/88620c51198fc3992fdfb5c0404c37da5855e1e1/libs/ofxCv/src/Calibration.cpp
+        float w = camera.pixelWidth; // imageSize.width;
+        float h = camera.pixelHeight; // imageSize.height;
+		//float fx = cameraMatrix.at<double>(0, 0);
+		//float fy = cameraMatrix.at<double>(1, 1);
+		//float cx = principalPoint.x;
+		//float cy = principalPoint.y;
+        float nearDist = camera.nearClipPlane;
+        float farDist = camera.farClipPlane;
+
+        return makeFrustumMatrix(
+            nearDist * (-cx) / fx, nearDist * (w - cx) / fx,
+            nearDist * (cy) / fy, nearDist * (cy - h) / fy,
+            nearDist, farDist);
+    }
+
+    private Matrix4x4 makeFrustumMatrix(float left, float right,
+                                        float bottom, float top,
+                                        float zNear, float zFar)
+    {
+        // https://github.com/openframeworks/openFrameworks/blob/master/libs/openFrameworks/math/ofMatrix4x4.cpp
+        // note transpose of ofMatrix4x4 wr.t OpenGL documentation, since the OSG use post multiplication rather than pre.
+        float A = (right + left) / (right - left);
+        float B = (top + bottom) / (top - bottom);
+        float C = -(zFar + zNear) / (zFar - zNear);
+        float D = -2.0f * zFar * zNear / (zFar - zNear);
+        // SET_ROW(0, 2.0*zNear/(right-left),                    0.0, 0.0,  0.0 )
+        // SET_ROW(1,                    0.0, 2.0*zNear/(top-bottom), 0.0,  0.0 )
+        // SET_ROW(2,                      A,                      B,   C, -1.0 )
+        // SET_ROW(3,                    0.0,                    0.0,   D,  0.0 )
+        var persp = new Matrix4x4();
+        persp[0, 0] = 2.0f * zNear / (right - left);
+
+        persp[1, 1] = 2.0f * zNear / (top - bottom);
+
+        persp[2, 0] = A;
+        persp[2, 1] = B;
+        persp[2, 2] = C;
+        persp[2, 3] = -1.0f;
+
+        persp[3, 2] = D;
+
+        return persp.transpose; // see commend above
     }
 
     private static Matrix4x4 CreateProjectionMatrixFromIntrinsic(double fx, double fy, double cx, double cy, Camera camera)

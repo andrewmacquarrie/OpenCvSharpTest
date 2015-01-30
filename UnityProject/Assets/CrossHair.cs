@@ -100,6 +100,7 @@ public class CrossHair : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             _dragging = null;
+            TriggerCalibration();
         }
 
         if (_dragging != null)
@@ -122,7 +123,7 @@ public class CrossHair : MonoBehaviour
         for (int i = 0; i < _imagePositions.Count; i++)
         {
             Vector3 imagePos = _imagePositions[i];
-            if (Mathf.Abs(imagePos.x - pos.x) + Mathf.Abs(imagePos.y - (_height - pos.y)) < 3)
+            if (Mathf.Abs(imagePos.x - pos.x) + Mathf.Abs(imagePos.y - (_height - pos.y)) < 5)
             {
                 imagePosMatch = i;
             }
