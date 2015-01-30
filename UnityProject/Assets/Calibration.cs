@@ -17,7 +17,6 @@ public class Calibration : MonoBehaviour {
 
     public Camera projectorCamera;
     public Camera _mainCamera;
-    private CvMat prevIntrinsic;
 
     public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
@@ -30,7 +29,6 @@ public class Calibration : MonoBehaviour {
         double height = (double)Screen.height;
         double width = (double)Screen.width;
 #endif
-
 
         int pointsCount = _imagePositions.Count;
         int numImages = 1;
@@ -46,54 +44,42 @@ public class Calibration : MonoBehaviour {
         if (usingNormalized)
             size = new Size(1, 1);
 
-        CvMat intrinsic;
-        if (prevIntrinsic == null)
-            intrinsic = createIntrinsicMatrix(height, width, usingNormalized);
-        else
-            intrinsic = prevIntrinsic;
-
+        CvMat intrinsic = createIntrinsicMatrix(height, width, usingNormalized);
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
-        
-        CvMat rotation_ = new CvMat(1, 3, MatrixType.F32C1);
-        CvMat translation_ = new CvMat(1, 3, MatrixType.F32C1);
+        CvMat rotation = new CvMat(1, 3, MatrixType.F32C1);
+        CvMat translation = new CvMat(1, 3, MatrixType.F32C1);
 
-        Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation_, translation_, false);
-
-        //CvMat rotation = new CvMat(numImages, 3, MatrixType.F64C1);
-        //CvMat translation = new CvMat(numImages, 3, MatrixType.F64C1);
+        Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation, translation, false);
 
         var flags = CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | 
             CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6;
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation_, translation_,  flags);
+        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation,  flags);
         
-        //prevIntrinsic = intrinsic;
+        double repojectionError = CalculateReprojectionError(_imagePositions, pointsCount, imagePoints, objectPoints, intrinsic, distortion, rotation, translation);
 
-        double repojectionError = CalculateReprojectionError(_imagePositions, pointsCount, imagePoints, objectPoints, intrinsic, distortion, rotation_, translation_);
+        CvMat rotationInverse = GetRotationMatrixFromRotationVector(rotation).Transpose(); // transpose is same as inverse for rotation matrix
+        CvMat transFinal = (rotationInverse * -1) * translation.Transpose();
 
+        // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
+        _mainCamera.projectionMatrix = loadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
+
+        ApplyTranslationAndRotationToCamera(transFinal, RotationConversion.RotationMatrixToEulerZXY(rotationInverse));
+
+        return repojectionError;
+    }
+
+    private static CvMat GetRotationMatrixFromRotationVector(CvMat rotation_)
+    {
         CvMat rotationFull = new CvMat(3, 3, MatrixType.F32C1);
-        Cv.Rodrigues2(rotation_, rotationFull); // get full rotation matrix from rotation vector
-
+        // get full rotation matrix from rotation vector
+        Cv.Rodrigues2(rotation_, rotationFull); 
         float[] LHSflipBackMatrix = new float[] { 1.0f, 0.0f, 0.0f, 
             0.0f, 1.0f, 0.0f, 
             0.0f, 0.0f, -1.0f };
         CvMat LHSflipBackMatrixM = new CvMat(3, 3, MatrixType.F32C1, LHSflipBackMatrix);
         CvMat rotLHS = rotationFull * LHSflipBackMatrixM; // invert Z (as we did before when savings points) to get from RHS -> LHS
-        CvMat rotTran = rotLHS.Transpose(); // transpose is same as inverse for rotation matrix
-        CvMat transTran = translation_.Transpose(); // to get in right format
-        CvMat rotFinal = (rotTran * -1);
-
-        CvMat transFinal = rotFinal * transTran;
-
-        // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
-       // _mainCamera.projectionMatrix = CreateProjectionMatrixFromIntrinsic(intrinsic[0, 0], intrinsic[1, 1], intrinsic[0, 2], intrinsic[1, 2], _mainCamera);
-        _mainCamera.projectionMatrix = loadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
-
-        Rotation r = RotationConversion.RToEulerZXY(rotTran);
-        ApplyTranslationAndRotationToCamera(transFinal, r);
-        //ApplyIntrinsicToCamera(intrinsic, height, width, usingNormalized);
-
-        return repojectionError;
+        return rotLHS;
     }
 
     private double CalculateReprojectionError(List<Vector3> _imagePositions, int pointsCount, CvMat imagePoints, CvMat objectPoints, CvMat intrinsic, CvMat distortion, CvMat rotation_, CvMat translation_)
@@ -118,12 +104,8 @@ public class Calibration : MonoBehaviour {
     private Matrix4x4 loadProjectionMatrix(Camera camera, float fx, float fy, float cx, float cy)
     {
         // https://github.com/kylemcdonald/ofxCv/blob/88620c51198fc3992fdfb5c0404c37da5855e1e1/libs/ofxCv/src/Calibration.cpp
-        float w = camera.pixelWidth; // imageSize.width;
-        float h = camera.pixelHeight; // imageSize.height;
-		//float fx = cameraMatrix.at<double>(0, 0);
-		//float fy = cameraMatrix.at<double>(1, 1);
-		//float cx = principalPoint.x;
-		//float cy = principalPoint.y;
+        float w = camera.pixelWidth;
+        float h = camera.pixelHeight;
         float nearDist = camera.nearClipPlane;
         float farDist = camera.farClipPlane;
 
@@ -139,107 +121,29 @@ public class Calibration : MonoBehaviour {
     {
         // https://github.com/openframeworks/openFrameworks/blob/master/libs/openFrameworks/math/ofMatrix4x4.cpp
         // note transpose of ofMatrix4x4 wr.t OpenGL documentation, since the OSG use post multiplication rather than pre.
+        // NB this has been transposed here from the original openframeworks code
+
         float A = (right + left) / (right - left);
         float B = (top + bottom) / (top - bottom);
         float C = -(zFar + zNear) / (zFar - zNear);
         float D = -2.0f * zFar * zNear / (zFar - zNear);
-        // SET_ROW(0, 2.0*zNear/(right-left),                    0.0, 0.0,  0.0 )
-        // SET_ROW(1,                    0.0, 2.0*zNear/(top-bottom), 0.0,  0.0 )
-        // SET_ROW(2,                      A,                      B,   C, -1.0 )
-        // SET_ROW(3,                    0.0,                    0.0,   D,  0.0 )
+
         var persp = new Matrix4x4();
         persp[0, 0] = 2.0f * zNear / (right - left);
-
         persp[1, 1] = 2.0f * zNear / (top - bottom);
-
         persp[2, 0] = A;
         persp[2, 1] = B;
         persp[2, 2] = C;
         persp[2, 3] = -1.0f;
-
         persp[3, 2] = D;
 
         var rhsToLhs = new Matrix4x4();
         rhsToLhs[0, 0] = 1.0f;
-        rhsToLhs[1, 1] = -1.0f; // RHS -> LHS
+        rhsToLhs[1, 1] = -1.0f; // Flip Y (RHS -> LHS)
         rhsToLhs[2, 2] = 1.0f;
         rhsToLhs[3, 3] = 1.0f;
 
-        return rhsToLhs * persp.transpose; // see commend above
-    }
-
-    private static Matrix4x4 CreateProjectionMatrixFromIntrinsic(double fx, double fy, double cx, double cy, Camera camera)
-    {
-        // from http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-        // imp from http://pastebin.com/h8nYNWJY
-
-        double alpha = fx;
-        double beta = fy;
-        double skew = 0.0;
-        double u0 = cx;
-        double v0 = cy;
- 
-        // These parameters define the final viewport that is rendered into by
-        // the camera.
-        double L = 0;
-        double R = camera.pixelWidth; // img_width;
-        double B = 0;
-        double T = camera.pixelHeight; // img_height;
- 
-        // near and far clipping planes, these only matter for the mapping from
-        // world-space z-coordinate into the depth coordinate for OpenGL
-        double N = camera.nearClipPlane; // near_clip;
-        double F = camera.farClipPlane; // far_clip;
-     
-        // construct a projection matrix, this is identical to the
-        // projection matrix computed for the intrinsics, except an
-        // additional row is inserted to map the z-coordinate to
-        // OpenGL.
-        var persp = new Matrix4x4();
-        persp[0, 0] = (float) alpha;
-        persp[0, 1] = (float)skew;
-        persp[0, 2] = (float)-u0;
-        persp[1, 1] = (float)beta;
-        persp[1, 2] = (float)-v0;
-        persp[2, 2] = (float)N + (float)F;
-        persp[2, 3] = (float)N * (float)F;
-        persp[3, 2] = (float)-1.0;
-
-        var ortho = new Matrix4x4();
-        ortho[0, 0] = 2.0f / (float)(R - L); 
-        ortho[0, 3] = (float) (-(R + L) / (R - L));
-        ortho[1, 1] = 2.0f / (float)(T - B); 
-        ortho[1, 3] = (float) (-(T + B) / (T - B));
-        ortho[2, 2] = -2.0f / (float)(F - N); 
-        ortho[2, 3] = (float) (-(F + N) / (F - N));
-        ortho[3, 3] =  1.0f;
-
-        return ortho * persp;
-    }
-
-    private void ApplyIntrinsicToCamera(CvMat intrinsic, double height, double width, bool usingNormalized)
-    {
-        double fx = intrinsic[0, 0];
-        double fy = intrinsic[1, 1];
-        double cx = intrinsic[0, 2];
-        double cy = intrinsic[1, 2];
-
-        if (usingNormalized)
-        {
-            fx *= width;
-            fy *= height;
-            cx *= width;
-            cy *= height;
-        }
-
-        // NB This is the vertical field of view; horizontal FOV varies depending on the viewport's aspect ratio
-        // from http://docs.unity3d.com/ScriptReference/Camera-fieldOfView.html
-
-        float fov = Mathf.Rad2Deg * 2.0f * Mathf.Atan((float) (height / (2.0 * fy)));
-        projectorCamera.fieldOfView = fov;
-        _mainCamera.fieldOfView = fov;
-
-        // TODO: apply princial point if different from centre of image? Could put camera inside empty game object and translate x,y by PP difference?
+        return rhsToLhs * persp.transpose; // see comment above
     }
 
     private void ApplyTranslationAndRotationToCamera(CvMat translation, Rotation r)
@@ -261,11 +165,6 @@ public class Calibration : MonoBehaviour {
         // taken from http://www.neilmendoza.com/projector-field-view-calculator/
         float hfov = 91.2705674249382f;
         float vfov = 59.8076333281726f;
-
-        // err taken temp from calibration-basic in mapamok
-        //float hfov = 57.35f;
-        //float vfov = 34.20f;
-
 
         double fx = (double)((float)width / (2.0f * Mathf.Tan(0.5f * hfov * Mathf.Deg2Rad)));
         double fy = (double)((float)height / (2.0f * Mathf.Tan(0.5f * vfov * Mathf.Deg2Rad)));
@@ -316,9 +215,4 @@ public class Calibration : MonoBehaviour {
 
         return new CvMat(pointsCount, 1, MatrixType.F32C2, allCorners.ToArray());
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

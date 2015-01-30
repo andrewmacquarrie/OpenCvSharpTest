@@ -12,7 +12,7 @@ namespace Assets
 
         static float EULER_EPSILON = 0.00005f;
 
-        static public Rotation RToEulerZXY(CvMat R)
+        static public Rotation RotationMatrixToEulerZXY(CvMat R)
         {
             var i = 2;
             var j = 0; // EULER_NEXT[2]
