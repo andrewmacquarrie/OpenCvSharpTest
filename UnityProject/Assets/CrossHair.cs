@@ -15,7 +15,9 @@ public class CrossHair : MonoBehaviour
 
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
+    List<Vector3> _normalizedImagePositions = new List<Vector3>();
     private bool _occludeWorld;
+    private bool _usingNormalised = false;
     private int _width;
     private int _height;
     private double _reprojError;
@@ -26,9 +28,16 @@ public class CrossHair : MonoBehaviour
     {
         _occludeWorld = false;
         _reprojError = 0.0;
-        _height = (int)Screen.height;
-        _width = (int)Screen.width;
 
+        #if UNITY_EDITOR
+            Vector2 hw = Handles.GetMainGameViewSize();
+            _height = (int)hw.y;
+            _width = (int)hw.x;
+        #endif
+        #if UNITY_EDITOR == false
+            _height = (int)Screen.height;
+            _width = (int)Screen.width;
+        #endif
     }
 
     // Update is called once per frame
@@ -42,6 +51,8 @@ public class CrossHair : MonoBehaviour
             GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
         }
         
+        //GUI.DrawTexture(new Rect(pos.x - (crosshairTexture.width / 2), _height - pos.y - (crosshairTexture.height / 2), crosshairTexture.width, crosshairTexture.height), crosshairTexture);
+
         _imagePositions.ForEach(delegate(Vector3 position)
         {
             int imagePointMarkerWidth = 5;
@@ -137,6 +148,7 @@ public class CrossHair : MonoBehaviour
         Vector3 pos = Input.mousePosition;
         pos.y = _height - pos.y; // note the screen pos starts bottom left. We want top left origin
         _imagePositions.Add(pos);
+        _normalizedImagePositions.Add(normalise(pos));
         _occludeWorld = false;
     }
 
@@ -153,7 +165,15 @@ public class CrossHair : MonoBehaviour
         if (_imagePositions.Count != _objectPositions.Count)
             return;
 
-        _reprojError = plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions);
+        if(_usingNormalised)
+            _reprojError = plugin.calibrateFromCorrespondences(_normalizedImagePositions, _objectPositions, true);
+        else
+            _reprojError = plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions, false);
+    }
+
+    private Vector3 normalise(Vector3 pos)
+    {
+        return new Vector3(pos.x / (float) _width, pos.y / (float) _height);
     }
 
     public List<Vector3> GetImagePoints()
@@ -166,12 +186,24 @@ public class CrossHair : MonoBehaviour
         return _objectPositions;
     }
 
-    public void ReplayRecordedPoints(List<Vector3> worldPoints, List<Vector3> imgPoints)
+    public void ReplayRecordedPoints(List<Vector3> worldPoints, List<Vector3> imgPoints, List<Vector3> normImgPoints, bool usingNorm)
     {
         _imagePositions = imgPoints;
         _objectPositions = worldPoints;
+        _normalizedImagePositions = normImgPoints;
+        _usingNormalised = usingNorm;
         foreach (var point in worldPoints)
             CreateSphereAt(point);
         TriggerCalibration();
+    }
+
+    public List<Vector3> GetNormalizedImagePoints()
+    {
+        return _normalizedImagePositions;
+    }
+
+    public bool  GetNormalizedFlag()
+    {
+        return _usingNormalised;
     }
 }

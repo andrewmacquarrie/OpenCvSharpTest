@@ -3,7 +3,7 @@ using System.Collections;
 
 public class DrawLine : MonoBehaviour {
     private Vector3 _xyPos;
-    private Material _lineMaterial;
+    private Material lineMaterial;
 
     void Start()
     {
@@ -12,15 +12,15 @@ public class DrawLine : MonoBehaviour {
 
     private void CreateLineMaterial()
     {
-        _lineMaterial = new Material("Shader \"Lines/Colored Blended\" {" +
+        lineMaterial = new Material("Shader \"Lines/Colored Blended\" {" +
             "SubShader { Pass { " +
             "    Blend SrcAlpha OneMinusSrcAlpha " +
             "    ZWrite Off Cull Off Fog { Mode Off } " +
             "    BindChannels {" +
             "      Bind \"vertex\", vertex Bind \"color\", color }" +
             "} } }");
-        _lineMaterial.hideFlags = HideFlags.HideAndDontSave;
-        _lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
+        lineMaterial.hideFlags = HideFlags.HideAndDontSave;
+        lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
     }
 
     public void SetXY(int x, int y)
@@ -35,11 +35,13 @@ public class DrawLine : MonoBehaviour {
 
     IEnumerator OnPostRenderMeth()
     {
+        float f = 0.1f;
+
         yield return new WaitForEndOfFrame();
 
         GL.PushMatrix();
         GL.LoadPixelMatrix();
-        _lineMaterial.SetPass(0);
+        lineMaterial.SetPass(0);
         GL.LoadOrtho();
         GL.Begin(GL.LINES);
         GL.Color(Color.red);
@@ -57,5 +59,6 @@ public class DrawLine : MonoBehaviour {
     void OnPostRender()
     {
         StartCoroutine(OnPostRenderMeth());
+        OnPostRenderMeth();
     }
 }

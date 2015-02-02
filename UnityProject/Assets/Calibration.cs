@@ -18,10 +18,17 @@ public class Calibration : MonoBehaviour {
     public Camera projectorCamera;
     public Camera _mainCamera;
 
-    public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
+    public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions, bool usingNormalized)
     {
+#if UNITY_EDITOR
+        Vector2 hw = Handles.GetMainGameViewSize();
+        double height = (double)hw.y;
+        double width = (double)hw.x;
+#endif
+#if UNITY_EDITOR == false
         double height = (double)Screen.height;
         double width = (double)Screen.width;
+#endif
 
         int pointsCount = _imagePositions.Count;
         int numImages = 1;
@@ -34,8 +41,10 @@ public class Calibration : MonoBehaviour {
         CvMat objectPoints = PutObjectPointsIntoCVMat(_objectPositions, pointsCount, numImages);
 
         Size size = new Size(width, height);
+        if (usingNormalized)
+            size = new Size(1, 1);
 
-        CvMat intrinsic = createIntrinsicMatrix(height, width);
+        CvMat intrinsic = createIntrinsicMatrix(height, width, usingNormalized);
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
         CvMat rotation = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation = new CvMat(1, 3, MatrixType.F32C1);
@@ -150,7 +159,7 @@ public class Calibration : MonoBehaviour {
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
     }
 
-    private CvMat createIntrinsicMatrix(double height, double width)
+    private CvMat createIntrinsicMatrix(double height, double width, bool usingNormalized)
     {
         // from https://docs.google.com/spreadsheet/ccc?key=0AuC4NW61c3-cdDFhb1JxWUFIVWpEdXhabFNjdDJLZXc#gid=0
         // taken from http://www.neilmendoza.com/projector-field-view-calculator/
@@ -163,9 +172,18 @@ public class Calibration : MonoBehaviour {
         double cy = height / 2.0;
         double cx = width / 2.0;
 
+        if (usingNormalized)
+        {
+            fx = fx / width;
+            fy = fy / height;
+            cy = cy / height;
+            cx = cx / width;
+        }
+
         double[] intrGuess = new double[] { fx, 0.0, cx, 
             0.0, fy, cy, 
             0.0, 0.0, 1.0 };
+
         return new CvMat(3, 3, MatrixType.F64C1, intrGuess);
     }
 
