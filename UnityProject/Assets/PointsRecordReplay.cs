@@ -42,7 +42,7 @@ public class PointsRecordReplay : MonoBehaviour {
                 fileName = "recording.xml";
             #endif
             var recording = Recording.LoadFromFile(fileName);
-            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.ImagePointsV3((double)Screen.width, (double)Screen.height));
 
             Debug.Log("Loading complete");
         }
@@ -58,7 +58,7 @@ public class PointsRecordReplay : MonoBehaviour {
             #endif
             var recording = Recording.LoadFromFile(fileName);
             Screen.SetResolution(1906, 987, true);
-            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.ImagePointsV3((double)Screen.width, (double)Screen.height));
 
             Debug.Log("Loading complete");
         }
@@ -66,7 +66,7 @@ public class PointsRecordReplay : MonoBehaviour {
 
     private static void SaveToFile(List<Vector3> imagePoints, List<Vector3> worldPoints, string fileName)
     {
-        var recording = new Recording(imagePoints, worldPoints);
+        var recording = new Recording(imagePoints, worldPoints, (double)Screen.width, (double)Screen.height);
         recording.SaveToFile(fileName);
     }
 }

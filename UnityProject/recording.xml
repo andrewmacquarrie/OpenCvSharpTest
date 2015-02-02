@@ -2,230 +2,143 @@
 <Recording xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <worldPoints>
     <SerializableVector3>
-      <X>-4.996119</X>
-      <Y>2.5</Y>
-      <Z>-2.472939</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>0.002164841</X>
-      <Y>2.493012</Y>
-      <Z>-2.5</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>-0.0285368</X>
-      <Y>7.519059</Y>
-      <Z>-2.487023</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>4.903597</X>
-      <Y>7.522161</Y>
-      <Z>-2.5</Z>
-    </SerializableVector3>
-    <SerializableVector3>
       <X>-5</X>
-      <Y>2.494253</Y>
-      <Z>2.41882</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>-4.985372</X>
-      <Y>-2.458311</Y>
-      <Z>-2.5</Z>
+      <Y>2.482495</Y>
+      <Z>2.469793</Z>
     </SerializableVector3>
     <SerializableVector3>
       <X>-0.0285368</X>
-      <Y>7.507536</Y>
-      <Z>2.444567</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>4.958081</X>
-      <Y>-2.48098</Y>
-      <Z>-2.5</Z>
+      <Y>7.487785</Y>
+      <Z>-2.480525</Z>
     </SerializableVector3>
     <SerializableVector3>
       <X>-0.0285368</X>
-      <Y>2.545448</Y>
-      <Z>2.430417</Z>
+      <Y>7.474413</Y>
+      <Z>2.496401</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>-5</X>
-      <Y>-2.445418</Y>
-      <Z>2.434765</Z>
+      <X>4.916005</X>
+      <Y>7.5044</Y>
+      <Z>-2.5</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>4.929074</X>
+      <X>-4.992702</X>
+      <Y>2.488171</Y>
+      <Z>-2.5</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>-4.983267</X>
+      <Y>-2.48418</Y>
+      <Z>-2.5</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>4.866997</X>
+      <Y>-2.430379</Y>
+      <Z>-2.5</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>4.875982</X>
       <Y>7.530949</Y>
-      <Z>2.449382</Z>
+      <Z>2.437165</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>-0.02212715</X>
+      <Y>2.5</Y>
+      <Z>-2.484389</Z>
     </SerializableVector3>
   </worldPoints>
   <imagePoints>
     <SerializableVector3>
-      <X>1029</X>
-      <Y>698</Y>
+      <X>0.4708333</X>
+      <Y>0.4416667</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1308</X>
-      <Y>583</Y>
+      <X>0.6848958</X>
+      <Y>0.2490741</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1312</X>
-      <Y>268</Y>
+      <X>0.5921875</X>
+      <Y>0.1564815</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1527</X>
-      <Y>214</Y>
+      <X>0.7932292</X>
+      <Y>0.2027778</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>905</X>
-      <Y>478</Y>
+      <X>0.5354167</X>
+      <Y>0.6509259</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1029</X>
-      <Y>1057</Y>
+      <X>0.5354167</X>
+      <Y>0.9851852</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1136</X>
-      <Y>168</Y>
+      <X>0.79375</X>
+      <Y>0.7092593</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1523</X>
-      <Y>762</Y>
+      <X>0.6901042</X>
+      <Y>0.1287037</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>1128</X>
-      <Y>413</Y>
-      <Z>0</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>906</X>
-      <Y>748</Y>
-      <Z>0</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>1323</X>
-      <Y>136</Y>
+      <X>0.68125</X>
+      <Y>0.5407407</Y>
       <Z>0</Z>
     </SerializableVector3>
   </imagePoints>
   <worldPointsV3>
     <Vector3>
-      <x>-4.996119</x>
-      <y>2.5</y>
-      <z>-2.472939</z>
-    </Vector3>
-    <Vector3>
-      <x>0.002164841</x>
-      <y>2.493012</y>
-      <z>-2.5</z>
-    </Vector3>
-    <Vector3>
-      <x>-0.0285368</x>
-      <y>7.519059</y>
-      <z>-2.487023</z>
-    </Vector3>
-    <Vector3>
-      <x>4.903597</x>
-      <y>7.522161</y>
-      <z>-2.5</z>
-    </Vector3>
-    <Vector3>
       <x>-5</x>
-      <y>2.494253</y>
-      <z>2.41882</z>
-    </Vector3>
-    <Vector3>
-      <x>-4.985372</x>
-      <y>-2.458311</y>
-      <z>-2.5</z>
+      <y>2.482495</y>
+      <z>2.469793</z>
     </Vector3>
     <Vector3>
       <x>-0.0285368</x>
-      <y>7.507536</y>
-      <z>2.444567</z>
-    </Vector3>
-    <Vector3>
-      <x>4.958081</x>
-      <y>-2.48098</y>
-      <z>-2.5</z>
+      <y>7.487785</y>
+      <z>-2.480525</z>
     </Vector3>
     <Vector3>
       <x>-0.0285368</x>
-      <y>2.545448</y>
-      <z>2.430417</z>
+      <y>7.474413</y>
+      <z>2.496401</z>
     </Vector3>
     <Vector3>
-      <x>-5</x>
-      <y>-2.445418</y>
-      <z>2.434765</z>
+      <x>4.916005</x>
+      <y>7.5044</y>
+      <z>-2.5</z>
     </Vector3>
     <Vector3>
-      <x>4.929074</x>
+      <x>-4.992702</x>
+      <y>2.488171</y>
+      <z>-2.5</z>
+    </Vector3>
+    <Vector3>
+      <x>-4.983267</x>
+      <y>-2.48418</y>
+      <z>-2.5</z>
+    </Vector3>
+    <Vector3>
+      <x>4.866997</x>
+      <y>-2.430379</y>
+      <z>-2.5</z>
+    </Vector3>
+    <Vector3>
+      <x>4.875982</x>
       <y>7.530949</y>
-      <z>2.449382</z>
+      <z>2.437165</z>
+    </Vector3>
+    <Vector3>
+      <x>-0.02212715</x>
+      <y>2.5</y>
+      <z>-2.484389</z>
     </Vector3>
   </worldPointsV3>
-  <imagePointsV3>
-    <Vector3>
-      <x>1029</x>
-      <y>698</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1308</x>
-      <y>583</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1312</x>
-      <y>268</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1527</x>
-      <y>214</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>905</x>
-      <y>478</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1029</x>
-      <y>1057</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1136</x>
-      <y>168</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1523</x>
-      <y>762</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1128</x>
-      <y>413</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>906</x>
-      <y>748</y>
-      <z>0</z>
-    </Vector3>
-    <Vector3>
-      <x>1323</x>
-      <y>136</y>
-      <z>0</z>
-    </Vector3>
-  </imagePointsV3>
 </Recording>

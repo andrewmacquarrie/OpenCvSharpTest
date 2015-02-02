@@ -29,5 +29,11 @@ namespace Assets
             Y = double.TryParse(vector.y.ToString(), out val) ? val : 0.0;
             Z = double.TryParse(vector.z.ToString(), out val) ? val : 0.0;
         }
+        public SerializableVector3(double x, double y, double z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
     }
 }

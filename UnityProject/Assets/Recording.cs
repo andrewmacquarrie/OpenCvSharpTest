@@ -14,9 +14,20 @@ namespace Assets
         // needed for serialization
         public Recording() { }
 
-        public Recording(List<Vector3> ip, List<Vector3> wp){
-            imagePoints = ConvertToSerializableList(ip);
+        public Recording(List<Vector3> ip, List<Vector3> wp, double width, double height){
+            List<Vector3> normalizedImagePoints = NormalizeImagePoints(ip, width, height);
+            imagePoints = ConvertToSerializableList(normalizedImagePoints);
             worldPoints = ConvertToSerializableList(wp);
+        }
+
+        private static List<Vector3> NormalizeImagePoints(List<Vector3> ip, double width, double height)
+        {
+            List<Vector3> normalizedImagePoints = new List<Vector3>();
+            foreach (Vector3 point in ip)
+            {
+                normalizedImagePoints.Add(new Vector3(point.x / (float) width, point.y / (float) height, point.z));
+            }
+            return normalizedImagePoints;
         }
 
         public List<SerializableVector3> worldPoints;
@@ -29,12 +40,14 @@ namespace Assets
             }
         }
 
-        public List<Vector3> imagePointsV3
+        public List<Vector3> ImagePointsV3(double width, double height)
         {
-            get
+            List<SerializableVector3> denormalizedPoints = new List<SerializableVector3>();
+            foreach (SerializableVector3 point in imagePoints)
             {
-                return ConvertToV3(imagePoints);
+                denormalizedPoints.Add(new SerializableVector3(point.X * width, point.Y * height, point.Z));
             }
+            return ConvertToV3(denormalizedPoints);
         }
 
         private List<Vector3> ConvertToV3(List<SerializableVector3> sv3List)
@@ -71,7 +84,6 @@ namespace Assets
                 return (Recording) xmlSerializer.Deserialize(textReader);
             }
         }
-
     }
 
     
