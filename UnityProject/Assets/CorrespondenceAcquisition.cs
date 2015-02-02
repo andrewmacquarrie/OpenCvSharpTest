@@ -112,7 +112,7 @@ public class CorrespondenceAcquisition : MonoBehaviour
 
         foreach (GameObject sphere in GameObject.FindGameObjectsWithTag(CALIB_SPHERE_TAG))
         {
-            sphere.SetActive(_calibrating);
+            sphere.renderer.enabled = _calibrating;
         }
     }
 
