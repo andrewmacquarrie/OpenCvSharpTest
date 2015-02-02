@@ -27,7 +27,7 @@ public class PointsRecordReplay : MonoBehaviour {
             #if UNITY_EDITOR == false
                 fileName = "recording.xml";
             #endif
-            SaveToFile(pointsHolder.GetImagePoints(), pointsHolder.GetNormalizedImagePoints(), pointsHolder.GetWorldPoints(), pointsHolder.GetNormalizedFlag(), fileName);
+            SaveToFile(pointsHolder.GetImagePoints(), pointsHolder.GetWorldPoints(), fileName);
 
             Debug.Log("Recording complete");
         }
@@ -42,7 +42,7 @@ public class PointsRecordReplay : MonoBehaviour {
                 fileName = "recording.xml";
             #endif
             var recording = Recording.LoadFromFile(fileName);
-            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3, recording.normalizedImagePointsV3, recording.normalized);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3);
 
             Debug.Log("Loading complete");
         }
@@ -58,16 +58,15 @@ public class PointsRecordReplay : MonoBehaviour {
             #endif
             var recording = Recording.LoadFromFile(fileName);
             Screen.SetResolution(1906, 987, true);
-            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3, recording.normalizedImagePointsV3, recording.normalized);
+            pointsHolder.ReplayRecordedPoints(recording.worldPointsV3, recording.imagePointsV3);
 
             Debug.Log("Loading complete");
         }
 	}
 
-    // (imagePoints, normalizedImagePoints, worldPoints, filenamePrefix
-    private static void SaveToFile(List<Vector3> imagePoints, List<Vector3> normalizedImagePoints, List<Vector3> worldPoints, bool usingNorm, string fileName)
+    private static void SaveToFile(List<Vector3> imagePoints, List<Vector3> worldPoints, string fileName)
     {
-        var recording = new Recording(imagePoints, normalizedImagePoints, worldPoints, usingNorm);
+        var recording = new Recording(imagePoints, worldPoints);
         recording.SaveToFile(fileName);
     }
 }
