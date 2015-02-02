@@ -19,9 +19,11 @@ public class CorrespondenceAcquisition : MonoBehaviour
     private int _height;
     private double _reprojectionError;
     private int? _dragging;
+    private bool _calibrating;
 
     private static int IMAGE_POINT_MARKER_SIZE = 5;
     private static int IMAGE_POINT_HIGHLIGHTED_SIZE = 10;
+    private static string CALIB_SPHERE_TAG = "CalibrationSphere";
 
     void Start()
     {
@@ -30,15 +32,18 @@ public class CorrespondenceAcquisition : MonoBehaviour
         _height = (int)Screen.height;
         _width = (int)Screen.width;
         _calibrator = new Calibration(_mainCamera, _testCamera);
+        _calibrating = true;
     }
 
     void OnGUI()
     {
+        if (!_calibrating)
+            return;
+
         if (_occludeWorld)
             OccludeScreen();
 
         _imagePositions.ForEach(delegate(Vector3 position) { DrawCrosshairImage(position, IMAGE_POINT_MARKER_SIZE); });
-
         if (ImagePointHighlighted())
             DrawCrosshairImage(_imagePositions[ImagePointMouseHooveringOver().Value], IMAGE_POINT_HIGHLIGHTED_SIZE);
 
@@ -61,6 +66,9 @@ public class CorrespondenceAcquisition : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            ToggleCalibrating();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -95,6 +103,16 @@ public class CorrespondenceAcquisition : MonoBehaviour
             var pos = Input.mousePosition;
             pos.y = _height - pos.y;
             _imagePositions[_dragging.Value] = pos;
+        }
+    }
+
+    private void ToggleCalibrating()
+    {
+        _calibrating = !_calibrating;
+
+        foreach (GameObject sphere in GameObject.FindGameObjectsWithTag(CALIB_SPHERE_TAG))
+        {
+            sphere.SetActive(_calibrating);
         }
     }
 
@@ -142,6 +160,7 @@ public class CorrespondenceAcquisition : MonoBehaviour
     {
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.transform.position = point;
+        sphere.tag = CALIB_SPHERE_TAG;
     }
 
     private void TriggerCalibration()
