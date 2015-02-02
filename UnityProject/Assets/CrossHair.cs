@@ -10,8 +10,10 @@ using UnityEditor;
 public class CrossHair : MonoBehaviour
 {
     public Texture2D crosshairTexture;
-    public Calibration plugin;
+    public Calibration _calibrator;
     public int minNumberOfPoints = 8;
+    public Camera _mainCamera;
+    public Camera _testCamera;
 
     List<Vector3> _objectPositions = new List<Vector3>();
     List<Vector3> _imagePositions = new List<Vector3>();
@@ -21,17 +23,15 @@ public class CrossHair : MonoBehaviour
     private double _reprojError;
     private int? _dragging;
 
-    // Use this for initialization
     void Start()
     {
         _occludeWorld = false;
         _reprojError = 0.0;
         _height = (int)Screen.height;
         _width = (int)Screen.width;
-
+        _calibrator = new Calibration(_mainCamera, _testCamera);
     }
 
-    // Update is called once per frame
     void OnGUI()
     {
         var pos = Input.mousePosition;
@@ -153,7 +153,7 @@ public class CrossHair : MonoBehaviour
         if (_imagePositions.Count != _objectPositions.Count)
             return;
 
-        _reprojError = plugin.calibrateFromCorrespondences(_imagePositions, _objectPositions);
+        _reprojError = _calibrator.calibrateFromCorrespondences(_imagePositions, _objectPositions);
     }
 
     public List<Vector3> GetImagePoints()

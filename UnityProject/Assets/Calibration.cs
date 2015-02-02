@@ -7,20 +7,26 @@ using System.Text;
 using System.IO;
 using Assets;
 
-public class Calibration : MonoBehaviour {
+public class Calibration {
     // NB some code adapted from OpenCVSharp camera calibration example:
     // https://github.com/shimat/opencvsharp/blob/master/sample/CStyleSamplesCS/Samples/CalibrateCamera.cs
 
-    public Camera projectorCamera;
-    public Camera _mainCamera;
-
+    private Camera _testCamera;
+    private Camera _mainCamera;
     private static int _numImages = 1;
+    private double height;
+    private double width;
+
+    public Calibration(Camera mainCamera, Camera testCamera)
+    {
+        _mainCamera = mainCamera;
+        _testCamera = testCamera;
+        height = (double)Screen.height;
+        width = (double)Screen.width;
+    }
 
     public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
     {
-        double height = (double)Screen.height;
-        double width = (double)Screen.width;
-
         int numPoints = _imagePositions.Count;
 
         CvMat pointCounts = CreatePointCountMatrix(numPoints);
@@ -144,8 +150,8 @@ public class Calibration : MonoBehaviour {
         double ty = translation[0, 1];
         double tz = translation[0, 2];
 
-        projectorCamera.transform.position = new Vector3((float)tx, (float)ty, (float)tz);
-        projectorCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
+        _testCamera.transform.position = new Vector3((float)tx, (float)ty, (float)tz);
+        _testCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
 
         _mainCamera.transform.position = new Vector3((float)tx, (float)ty, (float)tz);
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
