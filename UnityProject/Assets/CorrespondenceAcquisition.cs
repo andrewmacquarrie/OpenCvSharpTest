@@ -1,32 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 // TODO: refactor so _height - pos.y is abstracted away
 
-public class CrossHair : MonoBehaviour
+public class CorrespondenceAcquisition : MonoBehaviour
 {
-    public Texture2D crosshairTexture;
+    public Texture2D _crosshairTexture;
     public Calibration _calibrator;
-    public int minNumberOfPoints = 8;
+    public int _minNumberOfPoints = 8;
     public Camera _mainCamera;
     public Camera _testCamera;
 
-    List<Vector3> _objectPositions = new List<Vector3>();
-    List<Vector3> _imagePositions = new List<Vector3>();
+    private List<Vector3> _objectPositions = new List<Vector3>();
+    private List<Vector3> _imagePositions = new List<Vector3>();
     private bool _occludeWorld;
     private int _width;
     private int _height;
-    private double _reprojError;
+    private double _reprojectionError;
     private int? _dragging;
+
+    private static int IMAGE_POINT_MARKER_SIZE = 5;
+    private static int IMAGE_POINT_HIGHLIGHTED_SIZE = 10;
 
     void Start()
     {
         _occludeWorld = false;
-        _reprojError = 0.0;
+        _reprojectionError = 0.0;
         _height = (int)Screen.height;
         _width = (int)Screen.width;
         _calibrator = new Calibration(_mainCamera, _testCamera);
@@ -34,28 +34,27 @@ public class CrossHair : MonoBehaviour
 
     void OnGUI()
     {
-        var pos = Input.mousePosition;
         if (_occludeWorld)
-        {
-            Texture2D blackTexture = new Texture2D(1, 1);
-            blackTexture.SetPixel(0, 0, Color.black);
-            GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
-        }
-        
-        _imagePositions.ForEach(delegate(Vector3 position)
-        {
-            int imagePointMarkerWidth = 5;
-            GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), crosshairTexture);
-        });
+            OccludeScreen();
+
+        _imagePositions.ForEach(delegate(Vector3 position) { DrawCrosshairImage(position, IMAGE_POINT_MARKER_SIZE); });
 
         if (ImagePointHighlighted())
-        {
-            int imagePointMarkerWidth = 10;
-            Vector3 position = _imagePositions[ImagePointMouseHooveringOver().Value];
-            GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), crosshairTexture);
-        }
+            DrawCrosshairImage(_imagePositions[ImagePointMouseHooveringOver().Value], IMAGE_POINT_HIGHLIGHTED_SIZE);
 
-        GUI.Box(new Rect(10, 10, 150, 90), "# points: " + _imagePositions.Count.ToString() + "\nReProj error: " + string.Format("{0:f2}", _reprojError));
+        GUI.Box(new Rect(10, 10, 150, 90), "# points: " + _imagePositions.Count.ToString() + "\nReProj error: " + string.Format("{0:f2}", _reprojectionError));
+    }
+
+    private void DrawCrosshairImage(Vector3 position, int imagePointMarkerWidth)
+    {
+        GUI.DrawTexture(new Rect(position.x - imagePointMarkerWidth, position.y - imagePointMarkerWidth, imagePointMarkerWidth * 2, imagePointMarkerWidth * 2), _crosshairTexture);
+    }
+
+    private void OccludeScreen()
+    {
+        Texture2D blackTexture = new Texture2D(1, 1);
+        blackTexture.SetPixel(0, 0, Color.black);
+        GUI.DrawTexture(new Rect(0, 0, _width, _height), blackTexture);
     }
 
     void Update()
@@ -67,7 +66,6 @@ public class CrossHair : MonoBehaviour
         {
             if (ImagePointHighlighted())
             {
-                // do something with highlighted point - allow click and drag?
                 _dragging = ImagePointMouseHooveringOver();
             }
             else
@@ -148,12 +146,12 @@ public class CrossHair : MonoBehaviour
 
     private void TriggerCalibration()
     {
-        if (_imagePositions.Count < minNumberOfPoints)
+        if (_imagePositions.Count < _minNumberOfPoints)
             return;
         if (_imagePositions.Count != _objectPositions.Count)
             return;
 
-        _reprojError = _calibrator.calibrateFromCorrespondences(_imagePositions, _objectPositions);
+        _reprojectionError = _calibrator.calibrateFromCorrespondences(_imagePositions, _objectPositions);
     }
 
     public List<Vector3> GetImagePoints()

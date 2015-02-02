@@ -25,39 +25,33 @@ public class Calibration {
         width = (double)Screen.width;
     }
 
-    public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
+    public double calibrateFromCorrespondences(List<Vector3> imagePoints, List<Vector3> worldPoints)
     {
-        int numPoints = _imagePositions.Count;
-
+        int numPoints = imagePoints.Count;
         CvMat pointCounts = CreatePointCountMatrix(numPoints);
-        CvMat imagePoints = PutImagePointsIntoCVMat(_imagePositions, numPoints);
-        CvMat objectPoints = PutObjectPointsIntoCVMat(_objectPositions, numPoints, _numImages);
-
+        CvMat imagePointsCvMat = PutImagePointsIntoCVMat(imagePoints, numPoints);
+        CvMat worldPointsCvMat = PutObjectPointsIntoCVMat(worldPoints, numPoints, _numImages);
         Size size = new Size(width, height);
-
-        CvMat intrinsic = CreateIntrinsicMatrix(height, width);
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
         CvMat rotation = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation = new CvMat(1, 3, MatrixType.F32C1);
-
-        Cv.FindExtrinsicCameraParams2(objectPoints, imagePoints, intrinsic, distortion, rotation, translation, false);
-
+        CvMat intrinsic = CreateIntrinsicGuess(height, width);
         var flags = CalibrationFlag.ZeroTangentDist | CalibrationFlag.UseIntrinsicGuess | 
             CalibrationFlag.FixK1 | CalibrationFlag.FixK2 | CalibrationFlag.FixK3 | CalibrationFlag.FixK4 | CalibrationFlag.FixK5 | CalibrationFlag.FixK6;
 
-        Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation,  flags);
-        
-        double repojectionError = CalculateReprojectionError(_imagePositions, numPoints, imagePoints, objectPoints, intrinsic, distortion, rotation, translation);
+        Cv.CalibrateCamera2(worldPointsCvMat, imagePointsCvMat, pointCounts, size, intrinsic, distortion, rotation, translation,  flags);
 
+        ApplyCalibrationToUnityCamera(intrinsic, rotation, translation);
+
+        return CalculateReprojectionError(imagePoints, numPoints, imagePointsCvMat, worldPointsCvMat, intrinsic, distortion, rotation, translation);
+    }
+
+    private void ApplyCalibrationToUnityCamera(CvMat intrinsic, CvMat rotation, CvMat translation)
+    {
         CvMat rotationInverse = GetRotationMatrixFromRotationVector(rotation).Transpose(); // transpose is same as inverse for rotation matrix
         CvMat transFinal = (rotationInverse * -1) * translation.Transpose();
-
-        // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
-        _mainCamera.projectionMatrix = LoadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
-
+        _mainCamera.projectionMatrix = LoadProjectionMatrix((float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
         ApplyTranslationAndRotationToCamera(transFinal, RotationConversion.RotationMatrixToEulerZXY(rotationInverse));
-
-        return repojectionError;
     }
 
     private static CvMat CreatePointCountMatrix(int numPoints)
@@ -99,13 +93,13 @@ public class Calibration {
         return diff;
     }
 
-    private Matrix4x4 LoadProjectionMatrix(Camera camera, float fx, float fy, float cx, float cy)
+    private Matrix4x4 LoadProjectionMatrix(float fx, float fy, float cx, float cy)
     {
         // https://github.com/kylemcdonald/ofxCv/blob/88620c51198fc3992fdfb5c0404c37da5855e1e1/libs/ofxCv/src/Calibration.cpp
-        float w = camera.pixelWidth;
-        float h = camera.pixelHeight;
-        float nearDist = camera.nearClipPlane;
-        float farDist = camera.farClipPlane;
+        float w = _mainCamera.pixelWidth;
+        float h = _mainCamera.pixelHeight;
+        float nearDist = _mainCamera.nearClipPlane;
+        float farDist = _mainCamera.farClipPlane;
 
         return MakeFrustumMatrix(
             nearDist * (-cx) / fx, nearDist * (w - cx) / fx,
@@ -157,7 +151,7 @@ public class Calibration {
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
     }
 
-    private CvMat CreateIntrinsicMatrix(double height, double width)
+    private CvMat CreateIntrinsicGuess(double height, double width)
     {
         // from https://docs.google.com/spreadsheet/ccc?key=0AuC4NW61c3-cdDFhb1JxWUFIVWpEdXhabFNjdDJLZXc#gid=0
         // taken from http://www.neilmendoza.com/projector-field-view-calculator/

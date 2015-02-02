@@ -9,7 +9,7 @@ using UnityEditor;
 #endif
 
 public class PointsRecordReplay : MonoBehaviour {
-    public CrossHair pointsHolder;
+    public CorrespondenceAcquisition pointsHolder;
 
 	// Use this for initialization
 	void Start () {
