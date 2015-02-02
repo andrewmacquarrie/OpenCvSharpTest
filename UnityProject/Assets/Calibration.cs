@@ -6,10 +6,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Assets;
-#if UNITY_EDITOR
-using UnityEditor;
-using System;
-#endif
 
 public class Calibration : MonoBehaviour {
     // NB some code adapted from OpenCVSharp camera calibration example:
@@ -18,24 +14,22 @@ public class Calibration : MonoBehaviour {
     public Camera projectorCamera;
     public Camera _mainCamera;
 
+    private static int _numImages = 1;
+
     public double calibrateFromCorrespondences(List<Vector3> _imagePositions, List<Vector3> _objectPositions)
     {
         double height = (double)Screen.height;
         double width = (double)Screen.width;
 
-        int pointsCount = _imagePositions.Count;
-        int numImages = 1;
-        int[] pointCountsValue = new int[numImages];
-        pointCountsValue[0] = pointsCount;
+        int numPoints = _imagePositions.Count;
 
-        CvMat pointCounts = new CvMat(numImages, 1, MatrixType.S32C1, pointCountsValue);
-
-        CvMat imagePoints = PutImagePointsIntoCVMat(_imagePositions, pointsCount);
-        CvMat objectPoints = PutObjectPointsIntoCVMat(_objectPositions, pointsCount, numImages);
+        CvMat pointCounts = CreatePointCountMatrix(numPoints);
+        CvMat imagePoints = PutImagePointsIntoCVMat(_imagePositions, numPoints);
+        CvMat objectPoints = PutObjectPointsIntoCVMat(_objectPositions, numPoints, _numImages);
 
         Size size = new Size(width, height);
 
-        CvMat intrinsic = createIntrinsicMatrix(height, width);
+        CvMat intrinsic = CreateIntrinsicMatrix(height, width);
         CvMat distortion = new CvMat(1, 4, MatrixType.F64C1);
         CvMat rotation = new CvMat(1, 3, MatrixType.F32C1);
         CvMat translation = new CvMat(1, 3, MatrixType.F32C1);
@@ -47,17 +41,25 @@ public class Calibration : MonoBehaviour {
 
         Cv.CalibrateCamera2(objectPoints, imagePoints, pointCounts, size, intrinsic, distortion, rotation, translation,  flags);
         
-        double repojectionError = CalculateReprojectionError(_imagePositions, pointsCount, imagePoints, objectPoints, intrinsic, distortion, rotation, translation);
+        double repojectionError = CalculateReprojectionError(_imagePositions, numPoints, imagePoints, objectPoints, intrinsic, distortion, rotation, translation);
 
         CvMat rotationInverse = GetRotationMatrixFromRotationVector(rotation).Transpose(); // transpose is same as inverse for rotation matrix
         CvMat transFinal = (rotationInverse * -1) * translation.Transpose();
 
         // NB: Aspect ratio must be set to 16:9 in order for this to work (due to fx/fy)
-        _mainCamera.projectionMatrix = loadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
+        _mainCamera.projectionMatrix = LoadProjectionMatrix(_mainCamera, (float)intrinsic[0, 0], (float)intrinsic[1, 1], (float)intrinsic[0, 2], (float)intrinsic[1, 2]);
 
         ApplyTranslationAndRotationToCamera(transFinal, RotationConversion.RotationMatrixToEulerZXY(rotationInverse));
 
         return repojectionError;
+    }
+
+    private static CvMat CreatePointCountMatrix(int numPoints)
+    {
+        int[] pointCountsValue = new int[_numImages];
+        pointCountsValue[0] = numPoints;
+        CvMat pointCounts = new CvMat(_numImages, 1, MatrixType.S32C1, pointCountsValue);
+        return pointCounts;
     }
 
     private static CvMat GetRotationMatrixFromRotationVector(CvMat rotation_)
@@ -91,8 +93,7 @@ public class Calibration : MonoBehaviour {
         return diff;
     }
 
-
-    private Matrix4x4 loadProjectionMatrix(Camera camera, float fx, float fy, float cx, float cy)
+    private Matrix4x4 LoadProjectionMatrix(Camera camera, float fx, float fy, float cx, float cy)
     {
         // https://github.com/kylemcdonald/ofxCv/blob/88620c51198fc3992fdfb5c0404c37da5855e1e1/libs/ofxCv/src/Calibration.cpp
         float w = camera.pixelWidth;
@@ -100,13 +101,13 @@ public class Calibration : MonoBehaviour {
         float nearDist = camera.nearClipPlane;
         float farDist = camera.farClipPlane;
 
-        return makeFrustumMatrix(
+        return MakeFrustumMatrix(
             nearDist * (-cx) / fx, nearDist * (w - cx) / fx,
             nearDist * (cy) / fy, nearDist * (cy - h) / fy,
             nearDist, farDist);
     }
 
-    private Matrix4x4 makeFrustumMatrix(float left, float right,
+    private Matrix4x4 MakeFrustumMatrix(float left, float right,
                                         float bottom, float top,
                                         float zNear, float zFar)
     {
@@ -150,7 +151,7 @@ public class Calibration : MonoBehaviour {
         _mainCamera.transform.eulerAngles = new Vector3((float)r.X, (float)r.Y, (float)r.Z);
     }
 
-    private CvMat createIntrinsicMatrix(double height, double width)
+    private CvMat CreateIntrinsicMatrix(double height, double width)
     {
         // from https://docs.google.com/spreadsheet/ccc?key=0AuC4NW61c3-cdDFhb1JxWUFIVWpEdXhabFNjdDJLZXc#gid=0
         // taken from http://www.neilmendoza.com/projector-field-view-calculator/
