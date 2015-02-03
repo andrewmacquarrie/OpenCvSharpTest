@@ -2,113 +2,113 @@
 <Recording xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <worldPoints>
     <SerializableVector3>
-      <X>-4.992702</X>
-      <Y>2.48817</Y>
-      <Z>-2.5</Z>
+      <X>-4.65098</X>
+      <Y>2.5</Y>
+      <Z>1.49705</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>4.903597</X>
-      <Y>7.522161</Y>
-      <Z>-2.5</Z>
+      <X>-0.4741859</X>
+      <Y>2.5</Y>
+      <Z>1.557647</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>-0.0285368</X>
-      <Y>7.498578</Y>
-      <Z>2.473223</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>4.951324</X>
+      <X>0.6682987</X>
       <Y>7.530949</Y>
-      <Z>2.481769</Z>
+      <Z>0.67834</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>-5</X>
-      <Y>2.464602</Y>
-      <Z>2.467855</Z>
-    </SerializableVector3>
-    <SerializableVector3>
-      <X>-4.966691</X>
-      <Y>-2.495081</Y>
+      <X>2.536816</X>
+      <Y>5.661165</Y>
       <Z>-2.5</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>4.866996</X>
-      <Y>-2.430377</Y>
+      <X>2.656501</X>
+      <Y>-1.244058</Y>
       <Z>-2.5</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>-4.966631</X>
+      <Y>0.3383741</Y>
+      <Z>-2.5</Z>
+    </SerializableVector3>
+    <SerializableVector3>
+      <X>-2.683933</X>
+      <Y>2.5</Y>
+      <Z>-1.028428</Z>
     </SerializableVector3>
   </worldPoints>
   <imagePoints>
     <SerializableVector3>
-      <X>0.5416667</X>
-      <Y>0.6481481</Y>
+      <X>0.2981928</X>
+      <Y>0.4750656</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.7541667</X>
-      <Y>0.162037</Y>
+      <X>0.4066265</X>
+      <Y>0.4461942</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5619792</X>
-      <Y>0.1351852</Y>
+      <X>0.4743976</X>
+      <Y>0.2388451</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.6458333</X>
-      <Y>0.09907407</Y>
+      <X>0.560241</X>
+      <Y>0.3937008</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.4447917</X>
-      <Y>0.4444444</Y>
+      <X>0.5060241</X>
+      <Y>0.6535433</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.5354167</X>
-      <Y>0.9768519</Y>
+      <X>0.3298193</X>
+      <Y>0.7139108</Y>
       <Z>0</Z>
     </SerializableVector3>
     <SerializableVector3>
-      <X>0.7416667</X>
-      <Y>0.6277778</Y>
+      <X>0.3870482</X>
+      <Y>0.5328084</Y>
       <Z>0</Z>
     </SerializableVector3>
   </imagePoints>
   <worldPointsV3>
     <Vector3>
-      <x>-4.992702</x>
-      <y>2.48817</y>
-      <z>-2.5</z>
+      <x>-4.65098</x>
+      <y>2.5</y>
+      <z>1.49705</z>
     </Vector3>
     <Vector3>
-      <x>4.903597</x>
-      <y>7.522161</y>
-      <z>-2.5</z>
+      <x>-0.4741859</x>
+      <y>2.5</y>
+      <z>1.557647</z>
     </Vector3>
     <Vector3>
-      <x>-0.0285368</x>
-      <y>7.498578</y>
-      <z>2.473223</z>
-    </Vector3>
-    <Vector3>
-      <x>4.951324</x>
+      <x>0.6682987</x>
       <y>7.530949</y>
-      <z>2.481769</z>
+      <z>0.67834</z>
     </Vector3>
     <Vector3>
-      <x>-5</x>
-      <y>2.464602</y>
-      <z>2.467855</z>
-    </Vector3>
-    <Vector3>
-      <x>-4.966691</x>
-      <y>-2.495081</y>
+      <x>2.536816</x>
+      <y>5.661165</y>
       <z>-2.5</z>
     </Vector3>
     <Vector3>
-      <x>4.866996</x>
-      <y>-2.430377</y>
+      <x>2.656501</x>
+      <y>-1.244058</y>
       <z>-2.5</z>
+    </Vector3>
+    <Vector3>
+      <x>-4.966631</x>
+      <y>0.3383741</y>
+      <z>-2.5</z>
+    </Vector3>
+    <Vector3>
+      <x>-2.683933</x>
+      <y>2.5</y>
+      <z>-1.028428</z>
     </Vector3>
   </worldPointsV3>
 </Recording>
